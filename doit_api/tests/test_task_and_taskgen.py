@@ -66,15 +66,22 @@ def test_task(monkeypatch, depfile_name, capsys):
     task_list = loader.load_tasks(Command(), [])
     assert len(task_list) == 9
 
+    # Note: unfortunately on python 3.5 and 3.6 the order does not seem guaranteed with this api
     # task a
-    assert task_list[0].name == 'a'
-    assert task_list[0].doc == a.func.__doc__.strip()
-    assert task_list[0].actions[0].py_callable == why_am_i_running
-    assert task_list[0].actions[1].py_callable == a.func
-    assert task_list[0].title() == 'a => custom title'
+    task_a = [t for t in task_list if t.name == 'a']
+    assert len(task_a) == 1
+    task_a = task_a[0]
+    assert task_a.name == 'a'
+    assert task_a.doc == a.func.__doc__.strip()
+    assert task_a.actions[0].py_callable == why_am_i_running
+    assert task_a.actions[1].py_callable == a.func
+    assert task_a.title() == 'a => custom title'
 
     # task b dependency
-    assert task_list[1].task_dep == ['a']
+    task_b = [t for t in task_list if t.name == 'b']
+    assert len(task_b) == 1
+    task_b = task_b[0]
+    assert task_b.task_dep == ['a']
 
     # task c with 2 subtasks
     # todo
