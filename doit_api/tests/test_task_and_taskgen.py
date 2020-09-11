@@ -144,15 +144,15 @@ hello variant
         cmd_list = CmdFactory(List, outstream=output, task_list=task_list)
         cmd_list._execute(subtasks=True, quiet=False)
         assert output.getvalue() == """a                     hey
-    b                     hey!
-    c                     hey!!!
-    c:c_                  here is a doc
-    c:echo                my echo doc
-    c:subtask 0           a subtask 0
-    c:subtask 0 variant   a subtask 0 variant
-    c:subtask 1           a subtask 1
-    c:subtask 1 variant   a subtask 1 variant
-    """
+b                     hey!
+c                     hey!!!
+c:c_                  here is a doc
+c:echo                my echo doc
+c:subtask 0           a subtask 0
+c:subtask 0 variant   a subtask 0 variant
+c:subtask 1           a subtask 1
+c:subtask 1 variant   a subtask 1 variant
+"""
 
         # formal checks: equivalent of   doit  (execution)
         output = StringIO()
@@ -160,23 +160,23 @@ hello variant
         result = cmd_run._execute(output, verbosity=2)
         assert 0 == result
         assert output.getvalue() == """.  a => custom title
-    .  b => Python: function test_task.<locals>.b
-    .  c:echo => Cmd: echo hi
-    .  c:c_ => Python: function test_task.<locals>.c.<locals>.c_
-    .  c:subtask 0 => this is 0 running
-    .  c:subtask 0 variant => this is 0 running variant
-    .  c:subtask 1 => this is 1 running
-    .  c:subtask 1 variant => this is 1 running variant
-    """
+.  b => Python: function test_task.<locals>.b
+.  c:echo => Cmd: echo hi
+.  c:c_ => Python: function test_task.<locals>.c.<locals>.c_
+.  c:subtask 0 => this is 0 running
+.  c:subtask 0 variant => this is 0 running variant
+.  c:subtask 1 => this is 1 running
+.  c:subtask 1 variant => this is 1 running variant
+"""
         captured = capsys.readouterr()
         with capsys.disabled():
             assert captured.out.replace("\r", "") == """hello !
-    hello !!
-    Running <Task: c:echo> because one of its targets does not exist anymore: 'hoho.txt'
-    hi
-    hello
-    hello sub
-    hello variant
-    hello sub
-    hello variant
-    """
+hello !!
+Running <Task: c:echo> because one of its targets does not exist anymore: 'hoho.txt'
+hi
+hello
+hello sub
+hello variant
+hello sub
+hello variant
+"""
