@@ -1,6 +1,17 @@
-from doit.action import CmdAction
 from inspect import isgeneratorfunction
 from os.path import exists
+
+try:
+    from typing import Callable, Union, List, Tuple, Dict, Optional
+    from pathlib import Path
+
+    DoitAction = Union[str, List, Callable, Tuple[Callable, Tuple, Dict]]
+    DoitTask = Union[str, Callable, 'task', 'taskgen']
+    DoitPath = Union[str, Path]
+except ImportError:
+    pass
+
+from doit.action import CmdAction
 
 
 # --- task utilities
@@ -8,8 +19,9 @@ from os.path import exists
 
 def why_am_i_running(task, changed):
     """
-    A python action for doit, to print the reason why a task is running. Useful for debug.
-    see https://github.com/pydoit/doit/issues/277
+    Goodie: a python action that you can use in any `doit` task, to print the reason why the task is running if the
+    task declared a `file_dep`, `task_dep`, `uptodate` or `targets`. Useful for debugging.
+    See [this doit conversation](https://github.com/pydoit/doit/issues/277).
     """
     for t in task.targets:
         if not exists(t):
@@ -24,8 +36,8 @@ def why_am_i_running(task, changed):
 
 def title_with_actions(task):
     """
-    A title creation callable for doit tasks.
-    Same than `doit.title_with_actions` but removes `why_am_i_running` actions
+    Goodie: an automatic title for doit tasks.
+    Same than `doit.title_with_actions` but removes `why_am_i_running` actions if any is present.
     """
 
     if task.actions:
@@ -82,13 +94,18 @@ def replace_task_names(list_of_tasks):
             elif callable(o):
                 yield o.__name__.replace('task_', '')
             else:
+                # a string task name
                 yield o
     return list(gen_all())
 
 
 class taskbase(object):
     """ Base class for `task` and `taskgen`. """
-    def __init__(self, name, doc, title):
+    def __init__(self,
+                 name,  # type: str
+                 doc,   # type: str
+                 title  # type: Union[str, Callable]
+                 ):
         """
 
         :param name: an alternate base name for the task. By default the name of the decorated function is used.
@@ -154,6 +171,8 @@ class task(taskbase):
     Creates a doit task. It may be used as a decorator or as a creator:
 
     ```python
+    from doit_api import task
+
     @task
     def a():
         print("hi")
@@ -165,45 +184,51 @@ class task(taskbase):
     c = task(actions=["echo hi"])
     ```
 
+    It signature regroups all options that you usually can set on a `doit` task, with sensible defaults. See constructor
+    for details.
+
     Note: this relies on the `create_doit_tasks` hook, see https://pydoit.org/task_creation.html#custom-task-definition
     """
 
     def __init__(self,
                  _func=None,
                  *,
-                 name=None,
-                 title=title_with_actions,
-                 doc=None,
-                 #
-                 pre_actions=None,
-                 actions=None,
-                 post_actions=None,
-                 tell_why_am_i_running=True,
-                 #
-                 targets=None,
-                 file_dep=None,
-                 task_dep=None,
-                 uptodate=None,
-                 #
-                 setup=None,
-                 teardown=None,
-                 #
-                 getargs=None,
-                 calc_dep=None,
-                 #
-                 verbosity=None
+                 # -- task information
+                 name=None,                   # type: str
+                 doc=None,                    # type: str
+                 # -- what the task is doing when run
+                 title=title_with_actions,    # type: Union[str, Callable]
+                 pre_actions=None,            # type: List[DoitAction]
+                 actions=None,                # type: List[DoitAction]
+                 post_actions=None,           # type: List[DoitAction]
+                 tell_why_am_i_running=True,  # type: bool
+                 # -- preventing useless runs and selecting order
+                 targets=None,                # type: List[DoitPath]
+                 file_dep=None,               # type: List[DoitPath]
+                 task_dep=None,               # type: List[DoitTask]
+                 uptodate=None,               # type: List[Optional[Union[bool, Callable, str]]]
+                 # -- advanced
+                 setup=None,                  # type: List[DoitTask]
+                 teardown=None,               # type: List[DoitAction]
+                 getargs=None,                # type: Dict[str, Tuple[str, str]]
+                 calc_dep=None,               # type: List[DoitTask]
+                 # -- misc
+                 verbosity=None               # type: int
                  ):
         """
         A minimal `doit` task consists of one or several actions. When `@task` is used as a decorator, the main action
         is a call to the decorated function. Otherwise when `task` is used as a creator, you must provide at least one
         action in `actions`. You can specify actions to be done before and after that/these `actions` in `pre_actions`
-        and `post_actions`. By default `pre_actions` will print the reason why a task is running.
+        and `post_actions`. If `tell_why_i_am_runnin=True` (default) an additional action will be prepended to print
+        the reason why the task is running.
 
         All other parameters match those in `doit` conventions (See docstrings below), except
 
-         - `title` that is a bit more powerful and has a more convenient default value
+         - `name` that is an intelligent placeholder for `basename` (if a task is a simple task) or `name` (if the task
+           is a subtask in a `@taskgen` generator),
+         - `title` that adds support for plain strings and by default is `title_with_actions`
          - `task_dep`, `setup` and `calc_dep` where if a task callable (decorated with `@task` or not) is provided, the
-            corresponding name will be used.
+           corresponding name will be used.
 
         Note: the `watch` parameter (Linux and Mac only) is not yet supported.
         See https://pydoit.org/cmd_other.html?highlight=watch#auto-watch
@@ -211,12 +236,12 @@ class task(taskbase):
         :param name: an alternate name for the task. By default the name of the decorated function is used. Note that
             this parameter will intelligently set 'basename' for normal tasks or 'name' for subtasks in a task
             generator (`@taskgen`). See https://pydoit.org/tasks.html#task-name
+        :param doc: an optional documentation string for the task. If `@task` is used as a decorator, the decorated
+            function docstring will be used. See https://pydoit.org/tasks.html#doc
         :param title: an optional message string or callable generating a message, to print when the task is run. If
             nothing is provided, by default the task name is printed. If a string is provided, the task name will
             automatically be printed before it. If a callable is provided it should receive a single `task` argument
             and return a string. See https://pydoit.org/tasks.html#title
-        :param doc: an optional documentation string for the task. If `@task` is used as a decorator, the decorated
-            function docstring will be used. See https://pydoit.org/tasks.html#doc
         :param pre_actions: an optional list of actions to be executed before the main action(s).
             There are 2 basic kinds of actions: cmd-action and python-action. See https://pydoit.org/tasks.html#actions
         :param actions: a list of actions that this task should execute. If `task` is used as a decorator, this
@@ -231,7 +256,7 @@ class task(taskbase):
             run. See https://pydoit.org/tasks.html#file-dep-file-dependency
         :param task_dep: an optional list of tasks (names or callables) that should be run *before* this task. Note
             that this is also a convenient way to create a group of tasks.
-            https://pydoit.org/dependencies.html#task-dependency
+            See https://pydoit.org/dependencies.html#task-dependency
         :param uptodate: an optional list where each element can be True (up to date), False (not up to date),
             None (ignored), a callable or a command(string). Many pre-baked callables from `doit.tools` can be used:
             `result_dep` to depend on the result of another task, `run_once` to run only once, `timeout` for time-based
@@ -243,9 +268,10 @@ class task(taskbase):
         :param setup: tasks to be run before this task but only when it is run.
             See https://pydoit.org/dependencies.html#setup-task
         :param teardown: actions to run once all tasks are completed.
-            see https://pydoit.org/dependencies.html#setup-task
-        :param getargs: getargs provides a way to use values computed from one task in another task.
-            See https://pydoit.org/dependencies.html#getargs
+            See https://pydoit.org/dependencies.html#setup-task
+        :param getargs: an optional dictionary where the key is the argument name used on actions, and the value is a
+            tuple with 2 strings: task name, “value name”. getargs provides a way to use values computed from one task
+            in another task. See https://pydoit.org/dependencies.html#getargs
         :param calc_dep: See https://pydoit.org/dependencies.html#calculated-dependencies
         :param verbosity: an optional custom verbosity level (0, 1, or 2) for this task.
             See https://pydoit.org/tasks.html#verbosity
@@ -341,41 +367,67 @@ class task(taskbase):
 
 class taskgen(taskbase):
     """
-    A decorator to create a doit task generator.
+    A decorator to create a doit task generator (See https://pydoit.org/tasks.html#sub-tasks).
+
+    Similar to `@task`, you can use it without arguments and it will capture the name and docstring of the decorated
+    function. This function needs to be a generator, meaning that it should `yield` tasks. Such tasks can be plain old
+    dictionaries as in `doit`, or can be created with `task`.
+
+    For example this is a task group named `mygroup` with two tasks `mygroup:echo0` and `mygroup:echo1`
 
     ```python
-    @taskgen
-    def a():
-        yield task(actions=["echo hi"])
+    from doit_api import taskgen, task
 
-        @task
-        def _a():
-            print("hello")
-        yield _a
+    @taskgen
+    def mygroup():
+        ''' hey!!! '''
+        for i in range(2):
+            yield task(name="echo%s" % i, actions=["echo hi > hoho%s.txt" % i], targets=["hoho%s.txt" % i])
     ```
 
-    See https://pydoit.org/tasks.html#sub-tasks
+    And this is one with two python subtasks:
+
+    ```python
+    from doit_api import taskgen, task
+
+    @taskgen
+    def mygroup():
+        ''' hey!!! '''
+        for i in range(2):
+            @task(name="subtask %i" % i,
+                  doc="a subtask %s" % i,
+                  title="this is %s running" % i)
+            def c_():
+                print("hello sub")
+            yield c_
+    ```
+
+    `@taskgen` only accepts three optional arguments: `name` (that will be used for the base group name), doc, and
+    title.
+
     """
     def __init__(self,
                  _func=None,
                  *,
-                 basename=None,
-                 doc=None,
-                 title=None
+                 # -- task information
+                 name=None,  # type: str
+                 doc=None,   # type: str
+                 # -- what the task is doing when run
+                 title=None  # type: Union[str, Callable]
                  ):
         """
 
-        :param basename: an alternate base name for the task. By default the name of the decorated function is used.
-            See https://pydoit.org/tasks.html#task-name
-        :param title: an optional message string or callable generating a message, to print when the task is run. If
-            nothing is provided, by default the task name is printed. If a string is provided, the task name will
+        :param name: an alternate base name for the task group. By default the name of the decorated function is used.
+            See https://pydoit.org/tasks.html#sub-tasks
+        :param doc: an optional documentation string for the task group. By default the decorated
+            function docstring will be used. See https://pydoit.org/tasks.html#doc
+        :param title: an optional message string or callable generating a message, to print when this task group is run.
+            If nothing is provided, by default the task name is printed. If a string is provided, the task name will
             automatically be printed before it. If a callable is provided it should receive a single `task` argument
             and return a string. See https://pydoit.org/tasks.html#title
-        :param doc: an optional documentation string for the task. If `@task` is used as a decorator, the decorated
-            function docstring will be used. See https://pydoit.org/tasks.html#doc
         """
         # base
-        super(taskgen, self).__init__(name=basename, doc=doc, title=title)
+        super(taskgen, self).__init__(name=name, doc=doc, title=title)
 
         # this will be non-None if @taskgen is used as a decorator without arguments
         self.func = _func
