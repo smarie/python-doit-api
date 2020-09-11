@@ -112,10 +112,10 @@ c:subtask 1 variant   a subtask 1 variant
 
     captured = capsys.readouterr()
     with capsys.disabled():
-        assert captured.out == """hello !
+        assert captured.out.replace("\r", "") == """hello !
 hello !!
 Running <Task: c:echo> because one of its targets does not exist anymore: 'hoho.txt'
-hi\r
+hi
 hello
 hello sub
 hello variant
@@ -154,10 +154,10 @@ c:subtask 1 variant   a subtask 1 variant
 """
     captured = capsys.readouterr()
     with capsys.disabled():
-        assert captured.out == """hello !
+        assert captured.out.replace("\r", "") == """hello !
 hello !!
 Running <Task: c:echo> because one of its targets does not exist anymore: 'hoho.txt'
-hi\r
+hi
 hello
 hello sub
 hello variant
