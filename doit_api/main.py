@@ -29,7 +29,9 @@ def why_am_i_running(task, changed):
             return
 
     if changed is None or len(changed) == 0:
-        print("Running %s because it declares no mechanism (file_dep or target) to avoid useless executions." % task)
+        # silence
+        # print("Running %s because it declares no mechanism (file_dep or target) to avoid useless executions." % task)
+        pass
     else:
         print("Running %s because the following changed: %r" % (task, changed))
 
