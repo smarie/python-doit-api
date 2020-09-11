@@ -1,3 +1,4 @@
+import pytest
 import sys
 
 try:
@@ -14,6 +15,7 @@ from doit_api.tests.conftest import CmdFactory
 from doit_api import task, taskgen, why_am_i_running
 
 
+@pytest.mark.skipif(sys.version_info < (3, 0), reason="this test does not work on old doit api")
 def test_task(monkeypatch, depfile_name, capsys):
     """Tests that our various task generation mechanisms work"""
 

@@ -58,7 +58,7 @@ def validate_action(a):
     """
     Internal helper to validate an action. Validates the conventions in https://pydoit.org/tasks.html#actions
 
-     - a command action = A string (command to be executed with the shellà) or a list of strings or pathlib Paths
+     - a command action = A string (command to be executed with the shell) or a list of strings or pathlib Paths
        (command to be executed without the shell).
        See https://pydoit.org/tasks.html#cmd-action
 
@@ -196,7 +196,7 @@ class task(taskbase):
 
     def __init__(self,
                  _func=None,
-                 *,
+                 # *,  (support for python 2: no kw only args)
                  # -- task information
                  name=None,                   # type: str
                  doc=None,                    # type: str
@@ -264,7 +264,7 @@ class task(taskbase):
         :param uptodate: an optional list where each element can be True (up to date), False (not up to date),
             None (ignored), a callable or a command(string). Many pre-baked callables from `doit.tools` can be used:
             `result_dep` to depend on the result of another task, `run_once` to run only once, `timeout` for time-based
-            expiration, `config_changed` for changes in a “configuration” string or dictionary, and more...
+            expiration, `config_changed`for changes in a "configuration" string or dictionary, and more...
             See https://pydoit.org/dependencies.html#uptodate
         :param targets: an optional list of strings or instances of any pathlib Path class indicating the files created
             by the task. They can be any file path (a file or folder). If a target does not exist the task will be
@@ -274,7 +274,7 @@ class task(taskbase):
         :param teardown: actions to run once all tasks are completed.
             See https://pydoit.org/dependencies.html#setup-task
         :param getargs: an optional dictionary where the key is the argument name used on actions, and the value is a
-            tuple with 2 strings: task name, “value name”. getargs provides a way to use values computed from one task
+            tuple with 2 strings: task name, "value name". getargs provides a way to use values computed from one task
             in another task. See https://pydoit.org/dependencies.html#getargs
         :param calc_dep: See https://pydoit.org/dependencies.html#calculated-dependencies
         :param verbosity: an optional custom verbosity level (0, 1, or 2) for this task.
@@ -412,7 +412,7 @@ class taskgen(taskbase):
     """
     def __init__(self,
                  _func=None,
-                 *,
+                 # *,  (support for python 2: no kw only args)
                  # -- task information
                  name=None,  # type: str
                  doc=None,   # type: str

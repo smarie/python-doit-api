@@ -5,7 +5,6 @@ import os
 import pytest
 
 from doit.dependency import DbmDB, Dependency, MD5Checker
-from doit.cmd_base import get_loader
 
 
 # fixture for "doit.db". create/remove for every test
@@ -40,6 +39,9 @@ def CmdFactory(cls, outstream=None, task_loader=None, dep_file=None,
                backend=None, task_list=None, sel_tasks=None,
                dep_manager=None, config=None, cmds=None):
     """helper for test code, so test can call _execute() directly"""
+
+    # this import does not work in python 2 (doit 0.29)
+    from doit.cmd_base import get_loader
     loader = get_loader(config, task_loader, cmds)
     cmd = cls(task_loader=loader, config=config, cmds=cmds)
 

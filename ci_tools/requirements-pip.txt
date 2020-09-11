@@ -3,7 +3,7 @@ pytest-runner
 setuptools_scm
 
 # -- to install
-doit
+doit$DOIT_VERSION  # on python 2 we need ==0.29
 
 # --- to generate the reports (see scripts in ci_tools, called by .travis)
 pytest-html==1.9.0  # otherwise requires pytest 5

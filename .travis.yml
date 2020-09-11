@@ -5,10 +5,18 @@ cache: pip
 matrix:
   fast_finish: true
   include:
-    - python: 2.7
-    - python: 3.5
-    - python: 3.6
-    - python: 3.7
+    - name: "Python 2.7 doit 0.29"
+      python: 2.7
+      env: DOIT_VERSION="==0.29"  # indeed doit > 0.29 do not run on python 2
+    - name: "Python 3.5 doit latest"
+      python: 3.5
+      env: DOIT_VERSION=""
+    - name: "Python 3.6 doit latest"
+      python: 3.6
+      env: DOIT_VERSION=""
+    - name: "Python 3.7 doit latest"
+      python: 3.7
+      env: DOIT_VERSION=""
       dist: xenial
       sudo: true
 
