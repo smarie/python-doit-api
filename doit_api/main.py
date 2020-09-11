@@ -93,6 +93,8 @@ def replace_task_names(list_of_tasks):
         for o in list_of_tasks:
             if isinstance(o, task):
                 yield o.name
+            elif isinstance(o, taskgen):
+                yield o.name
             elif callable(o):
                 yield o.__name__.replace('task_', '')
             else:
