@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?><testsuite errors="0" failures="0" name="pytest" skips="0" tests="1" time="0.112"><testcase classname="doit_api.tests.test_task_and_taskgen" file="doit_api/tests/test_task_and_taskgen.py" line="17" name="test_task" time="0.04442238807678223"><system-out>.  a =&gt; custom title
+.  b =&gt; Python: function test_task.&lt;locals&gt;.b
+.  c:echo =&gt; Cmd: echo hi
+.  c:c_ =&gt; Python: function test_task.&lt;locals&gt;.c.&lt;locals&gt;.c_
+.  c:subtask 0 =&gt; this is 0 running
+.  c:subtask 0 variant =&gt; this is 0 running variant
+.  c:subtask 1 =&gt; this is 1 running
+.  c:subtask 1 variant =&gt; this is 1 running variant
+</system-out></testcase></testsuite>
