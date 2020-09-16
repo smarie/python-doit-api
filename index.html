@@ -234,6 +234,33 @@
     Task generator
   </a>
   
+    <nav class="md-nav" aria-label="Task generator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-1" class="md-nav__link">
+    Example 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-2" class="md-nav__link">
+    Example 2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#global-configuration" class="md-nav__link">
+    Global configuration
+  </a>
+  
 </li>
         
       </ul>
@@ -356,6 +383,33 @@
     Task generator
   </a>
   
+    <nav class="md-nav" aria-label="Task generator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-1" class="md-nav__link">
+    Example 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-2" class="md-nav__link">
+    Example 2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#global-configuration" class="md-nav__link">
+    Global configuration
+  </a>
+  
 </li>
         
       </ul>
@@ -430,9 +484,193 @@
 
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
 <h3 id="single-task">Single task<a class="headerlink" href="#single-task" title="Permanent link">&para;</a></h3>
-<p>TODO</p>
+<p>To create a single task you can use the <code>task</code> function or the <code>@pytask</code> decorator in your <code>dodo.py</code> file:</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">doit_api</span> <span class="kn">import</span> <span class="n">task</span><span class="p">,</span> <span class="n">pytask</span>
+
+<span class="nd">@pytask</span>
+<span class="k">def</span> <span class="nf">a</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; the doc for a &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+
+<span class="nd">@pytask</span><span class="p">(</span><span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;out.txt&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">b</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+
+<span class="n">c</span> <span class="o">=</span> <span class="n">task</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;echoer&quot;</span><span class="p">,</span> <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;echo hi&quot;</span><span class="p">],</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;the doc for e&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>Then you can list the tasks as usual :</p>
+<div class="codehilite"><pre><span></span><code>&gt;&gt;&gt; doit list
+a        the doc <span class="k">for</span> a
+b
+echoer   the doc <span class="k">for</span> e
+</code></pre></div>
+
+
+<p>Execute them:</p>
+<div class="codehilite"><pre><span></span><code>&gt;&gt;&gt; doit
+.  <span class="nv">a</span> <span class="o">=</span>&gt; Python: <span class="k">function</span> a
+.  <span class="nv">b</span> <span class="o">=</span>&gt; Python: <span class="k">function</span> b
+.  <span class="nv">echoer</span> <span class="o">=</span>&gt; Cmd: <span class="nb">echo</span> hi
+</code></pre></div>
+
+
+<p>And use verbosity to display the print messages too:</p>
+<div class="codehilite"><pre><span></span><code>&gt;&gt;&gt; doit -v <span class="m">2</span>
+.  <span class="nv">a</span> <span class="o">=</span>&gt; Python: <span class="k">function</span> a
+hi
+.  <span class="nv">b</span> <span class="o">=</span>&gt; Python: <span class="k">function</span> b
+Running &lt;Task: b&gt; because one of its targets does not exist: <span class="s1">&#39;out.txt&#39;</span>
+hi
+.  <span class="nv">echoer</span> <span class="o">=</span>&gt; Cmd: <span class="nb">echo</span> hi
+hi
+</code></pre></div>
+
+
+<p>Note that on that last command, an additional message is automatically added, explaining why task b was run. You can disable this with <code>tell_why_am_i_running=False</code>.</p>
+<p>See <a href="./api_reference/#task-or-task">API reference</a> for details.</p>
 <h3 id="task-generator">Task generator<a class="headerlink" href="#task-generator" title="Permanent link">&para;</a></h3>
-<p>TODO</p>
+<p>Now you may wish to create one task <em>per</em> something. This is named a task generator, or task group, creating so-called <a href="https://pydoit.org/tasks.html#sub-tasks">sub-tasks</a>. This can be done very easily by creating a python generator function, and decorating it with <code>@taskgen</code>.</p>
+<h4 id="example-1">Example 1<a class="headerlink" href="#example-1" title="Permanent link">&para;</a></h4>
+<p>For example this is a task group named <code>mygroup</code> with two tasks <code>mygroup:echo0</code> and <code>mygroup:echo1</code></p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">doit_api</span> <span class="kn">import</span> <span class="n">taskgen</span><span class="p">,</span> <span class="n">task</span>
+
+<span class="nd">@taskgen</span>
+<span class="k">def</span> <span class="nf">mygroup</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; hey !!! &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">task</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;echo</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span>
+                   <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;echo hi &gt; hoho</span><span class="si">%s</span><span class="s2">.txt&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">],</span>
+                   <span class="n">uptodate</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">],</span>  <span class="c1"># so that a second run skips the task</span>
+                   <span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hoho</span><span class="si">%s</span><span class="s2">.txt&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">],</span>
+                   <span class="n">clean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                   <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;echoes </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>Only the group appears in the tasks list by default, you need to activate the <code>--all</code> flag to see all:</p>
+<div class="codehilite"><pre><span></span><code>&gt;&gt;&gt; doit list
+mygroup   hey !!!
+
+&gt;&gt;&gt; doit list --all
+mygroup         hey !!!
+mygroup:echo0   echoes <span class="m">0</span>
+mygroup:echo1   echoes <span class="m">1</span>
+</code></pre></div>
+
+
+<p>Running the task creates the files as expected, and running a second time skips the tasks (notice the <code>--</code> symbol) since the files already exist and we said <code>update=[True]</code>:</p>
+<div class="codehilite"><pre><span></span><code>&gt;&gt;&gt; doit 
+. mygroup:echo0 <span class="o">=</span>&gt; Cmd: <span class="nb">echo</span> hi &gt; hoho0.txt
+. mygroup:echo1 <span class="o">=</span>&gt; Cmd: <span class="nb">echo</span> hi &gt; hoho1.txt
+
+&gt;&gt;&gt; doit 
+-- mygroup:echo0 <span class="o">=</span>&gt; Cmd: <span class="nb">echo</span> hi &gt; hoho0.txt
+-- mygroup:echo1 <span class="o">=</span>&gt; Cmd: <span class="nb">echo</span> hi &gt; hoho1.txt
+</code></pre></div>
+
+
+<p>Finally we can clean the files:</p>
+<div class="codehilite"><pre><span></span><code>&gt;&gt;&gt; doit clean
+mygroup:echo1 - removing file <span class="s1">&#39;hoho1.txt&#39;</span>
+mygroup:echo0 - removing file <span class="s1">&#39;hoho0.txt&#39;</span>
+</code></pre></div>
+
+
+<h4 id="example-2">Example 2<a class="headerlink" href="#example-2" title="Permanent link">&para;</a></h4>
+<p>This is a second example with two python subtasks:</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">doit_api</span> <span class="kn">import</span> <span class="n">taskgen</span><span class="p">,</span> <span class="n">pytask</span>
+
+<span class="nd">@taskgen</span>
+<span class="k">def</span> <span class="nf">mygroup</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; hey !!! &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="nd">@pytask</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;subtask </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span>
+                <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;a subtask </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;this is </span><span class="si">%s</span><span class="s2"> running&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">c_</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello sub&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">c_</span>
+</code></pre></div>
+
+
+<div class="codehilite"><pre><span></span><code>&gt;&gt;&gt; doit list --all
+mygroup             hey !!!
+mygroup:subtask <span class="m">0</span>   a subtask <span class="m">0</span>
+mygroup:subtask <span class="m">1</span>   a subtask <span class="m">1</span>
+
+&gt;&gt;&gt; doit --verbosity <span class="m">2</span>
+.  mygroup:subtask <span class="nv">0</span> <span class="o">=</span>&gt; this is <span class="m">0</span> running
+hello sub
+.  mygroup:subtask <span class="nv">1</span> <span class="o">=</span>&gt; this is <span class="m">1</span> running
+hello sub
+</code></pre></div>
+
+
+<p>You can leverage <a href="https://smarie.github.io/python-fprules/"><code>fprules</code></a> to generate <code>make</code>-like patterns easily:</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">fprules</span> <span class="kn">import</span> <span class="n">file_pattern</span>
+<span class="kn">from</span> <span class="nn">doit_api</span> <span class="kn">import</span> <span class="n">taskgen</span><span class="p">,</span> <span class="n">pytask</span>
+
+<span class="nd">@taskgen</span>
+<span class="k">def</span> <span class="nf">mygroup</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; hey !!! &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">fp</span> <span class="ow">in</span> <span class="n">file_pattern</span><span class="p">(</span><span class="n">src_pattern</span><span class="o">=</span><span class="s2">&quot;**/tests/**/[!_]*.py&quot;</span><span class="p">,</span> <span class="n">dst_pattern</span><span class="o">=</span><span class="s2">&quot;%.txt&quot;</span><span class="p">):</span>
+        <span class="nd">@pytask</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">fp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">doc</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">fp</span><span class="p">),</span>
+                <span class="n">file_dep</span><span class="o">=</span><span class="p">[</span><span class="n">fp</span><span class="o">.</span><span class="n">src_path</span><span class="p">],</span>
+                <span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="n">fp</span><span class="o">.</span><span class="n">dst_path</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">fp</span><span class="p">))</span>
+        <span class="k">def</span> <span class="nf">c_</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&gt;&gt;&gt; (todo) here you use </span><span class="si">%r</span><span class="s2"> to generate </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">src_path</span><span class="p">,</span> <span class="n">fp</span><span class="o">.</span><span class="n">dst_path</span><span class="p">))</span>
+        <span class="k">yield</span> <span class="n">c_</span>
+</code></pre></div>
+
+
+<div class="codehilite"><pre><span></span><code>&gt;&gt;&gt; doit list --all
+mygroup                                        hey !!!
+mygroup:doit_api/tests/conftest                <span class="o">[</span>doit_api/tests/conftest<span class="o">]</span> doit_api/tests/conftest.py -&gt; conftest.txt
+mygroup:doit_api/tests/test_config             <span class="o">[</span>doit_api/tests/test_config<span class="o">]</span> doit_api/tests/test_config.py -&gt; test_config.txt
+mygroup:doit_api/tests/test_task_and_taskgen   <span class="o">[</span>doit_api/tests/test_task_and_taskgen<span class="o">]</span> doit_api/tests/test_task_and_taskgen.py -&gt; test_task_and_taskgen.txt
+</code></pre></div>
+
+
+<p>And when executed:</p>
+<div class="codehilite"><pre><span></span><code>.  mygroup:doit_api/tests/conftest <span class="o">=</span>&gt; <span class="o">[</span>doit_api/tests/conftest<span class="o">]</span> doit_api/tests/conftest.py -&gt; conftest.txt
+Running &lt;Task: mygroup:doit_api/tests/conftest&gt; because one of its targets does not exist: <span class="s1">&#39;conftest.txt&#39;</span>
+&gt;&gt;&gt; <span class="o">(</span>todo<span class="o">)</span> here you use WindowsPath<span class="o">(</span><span class="s1">&#39;doit_api/tests/core/test_task_and_taskgen.py&#39;</span><span class="o">)</span> to generate WindowsPath<span class="o">(</span><span class="s1">&#39;test_task_and_taskgen.txt&#39;</span><span class="o">)</span>
+.  mygroup:doit_api/tests/core/test_config <span class="o">=</span>&gt; <span class="o">[</span>doit_api/tests/core/test_config<span class="o">]</span> doit_api/tests/core/test_config.py -&gt; test_config.txt
+Running &lt;Task: mygroup:doit_api/tests/core/test_config&gt; because one of its targets does not exist: <span class="s1">&#39;test_config.txt&#39;</span>
+&gt;&gt;&gt; <span class="o">(</span>todo<span class="o">)</span> here you use WindowsPath<span class="o">(</span><span class="s1">&#39;doit_api/tests/core/test_task_and_taskgen.py&#39;</span><span class="o">)</span> to generate WindowsPath<span class="o">(</span><span class="s1">&#39;test_task_and_taskgen.txt&#39;</span><span class="o">)</span>
+.  mygroup:doit_api/tests/core/test_pickling <span class="o">=</span>&gt; <span class="o">[</span>doit_api/tests/core/test_pickling<span class="o">]</span> doit_api/tests/core/test_pickling.py -&gt; test_pickling.txt
+Running &lt;Task: mygroup:doit_api/tests/core/test_pickling&gt; because one of its targets does not exist: <span class="s1">&#39;test_pickling.txt&#39;</span>
+&gt;&gt;&gt; <span class="o">(</span>todo<span class="o">)</span> here you use WindowsPath<span class="o">(</span><span class="s1">&#39;doit_api/tests/core/test_task_and_taskgen.py&#39;</span><span class="o">)</span> to generate WindowsPath<span class="o">(</span><span class="s1">&#39;test_task_and_taskgen.txt&#39;</span><span class="o">)</span>
+.  mygroup:doit_api/tests/core/test_task_and_taskgen <span class="o">=</span>&gt; <span class="o">[</span>doit_api/tests/core/test_task_and_taskgen<span class="o">]</span> doit_api/tests/core/test_task_and_taskgen.py -&gt; test_task_and_taskgen.txt
+Running &lt;Task: mygroup:doit_api/tests/core/test_task_and_taskgen&gt; because one of its targets does not exist: <span class="s1">&#39;test_task_and_taskgen.txt&#39;</span>
+&gt;&gt;&gt; <span class="o">(</span>todo<span class="o">)</span> here you use WindowsPath<span class="o">(</span><span class="s1">&#39;doit_api/tests/core/test_task_and_taskgen.py&#39;</span><span class="o">)</span> to generate WindowsPath<span class="o">(</span><span class="s1">&#39;test_task_and_taskgen.txt&#39;</span><span class="o">)</span>
+</code></pre></div>
+
+
+<h3 id="global-configuration">Global configuration<a class="headerlink" href="#global-configuration" title="Permanent link">&para;</a></h3>
+<p><code>DOIT_CONFIG</code> is the standard way to configure global options in <code>doit</code>. You can create this object very easily with the <code>doit_config</code> helper. For example here we set verbosity to be always 2, and configure <code>doit</code> to run on 2 processes:</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">doit_api</span> <span class="kn">import</span> <span class="n">doit_config</span><span class="p">,</span> <span class="n">pytask</span>
+
+<span class="n">DOIT_CONFIG</span> <span class="o">=</span> <span class="n">doit_config</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>   <span class="c1"># always verbose</span>
+                          <span class="n">num_process</span><span class="o">=</span><span class="mi">2</span>  <span class="c1"># parallel execution on 2 processes</span>
+                          <span class="p">)</span>
+
+<span class="nd">@pytask</span>
+<span class="k">def</span> <span class="nf">a</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; the doc for a &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+
+<span class="nd">@pytask</span>
+<span class="k">def</span> <span class="nf">b</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; the doc for b &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
 <h2 id="main-features-benefits">Main features / benefits<a class="headerlink" href="#main-features-benefits" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Develop <code>doit</code> tasks faster and more reliably</strong> thanks to you favourite python IDE's autocompletion and documentation features.</li>
@@ -514,7 +752,7 @@
     </div>
     
       <script src="assets/javascripts/vendor.3636a4ec.min.js"></script>
-      <script src="assets/javascripts/bundle.e9fe3281.min.js"></script><script id="__lang" type="application/json">{"search.config.separator": "[\\s\\-]+", "search.config.lang": "en", "clipboard.copied": "Copied to clipboard", "search.config.pipeline": "trimmer, stopWordFilter", "clipboard.copy": "Copy to clipboard", "search.result.none": "No matching documents", "search.result.placeholder": "Type to start searching", "search.result.other": "# matching documents", "search.result.one": "1 matching document"}</script>
+      <script src="assets/javascripts/bundle.e9fe3281.min.js"></script><script id="__lang" type="application/json">{"search.config.separator": "[\\s\\-]+", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.result.one": "1 matching document", "search.result.none": "No matching documents", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter"}</script>
       
       <script>
         app = initialize({

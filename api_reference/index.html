@@ -220,8 +220,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#task-or-task" class="md-nav__link">
-    @task or task
+  <a href="#doit_config" class="md-nav__link">
+    doit_config
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#task" class="md-nav__link">
+    task
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pytask" class="md-nav__link">
+    @pytask
   </a>
   
 </li>
@@ -290,8 +304,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#task-or-task" class="md-nav__link">
-    @task or task
+  <a href="#doit_config" class="md-nav__link">
+    doit_config
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#task" class="md-nav__link">
+    task
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pytask" class="md-nav__link">
+    @pytask
   </a>
   
 </li>
@@ -339,55 +367,283 @@
                 
                 <h1 id="api-reference">API reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h1>
 <p>In general, using <code>help(symbol)</code> is the recommended way to get the latest documentation. In addition, this page provides an overview of the various elements in this package.</p>
-<h3 id="task-or-task"><code>@task</code> or <code>task</code><a class="headerlink" href="#task-or-task" title="Permanent link">&para;</a></h3>
-<p>Creates a doit task. It may be used as a decorator with or without parameter, or as a creator:</p>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">doit_api</span> <span class="kn">import</span> <span class="n">task</span>
+<h3 id="doit_config"><code>doit_config</code><a class="headerlink" href="#doit_config" title="Permanent link">&para;</a></h3>
+<p>Generates a valid DOIT_CONFIG dictionary, that can contain GLOBAL options. You can use it at the beginning of your <code>dodo.py</code> file:</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">doit_api</span> <span class="kn">import</span> <span class="n">doit_config</span>
 
-<span class="nd">@task</span>
-<span class="k">def</span> <span class="nf">a</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
-
-<span class="nd">@task</span><span class="p">(</span><span class="n">targets</span><span class="o">=...</span><span class="p">,</span> <span class="n">file_deps</span><span class="o">=...</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">b</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
-
-<span class="n">c</span> <span class="o">=</span> <span class="n">task</span><span class="p">(</span><span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;echo hi&quot;</span><span class="p">])</span>
+<span class="n">DOIT_CONFIG</span> <span class="o">=</span> <span class="n">doit_config</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </code></pre></div>
 
 
-<p>It signature regroups all options that you usually can set on a <code>doit</code> task, with sensible defaults.
-A minimal <code>doit</code> task consists of one or several actions. When <code>@task</code> is used as a decorator, the main action is a call to the decorated function. Otherwise when <code>task</code> is used as a creator, you must provide at least one action in <code>actions</code>. You can specify actions to be done before and after that/these <code>actions</code> in <code>pre_actions</code> and <code>post_actions</code>. If <code>tell_why_i_am_runnin=True</code> (default) an additional action will be prepended to print the reason why the task is running if the task declared a <code>file_dep</code>, <code>task_dep</code>, <code>uptodate</code> or <code>targets</code>.</p>
+<p>Almost all <code>doit</code> command line options can be changed here. See https://pydoit.org/configuration.html#configuration-at-dodo-py</p>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">doit_config</span><span class="p">(</span>
+    <span class="c1"># execution related</span>
+    <span class="n">default_tasks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>             <span class="c1"># type: List[str]</span>
+    <span class="n">single</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                    <span class="c1"># type: bool</span>
+    <span class="n">continue_</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                 <span class="c1"># type: bool</span>
+    <span class="n">always</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                    <span class="c1"># type: bool</span>
+    <span class="n">cleanforget</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>               <span class="c1"># type: bool</span>
+    <span class="n">cleandep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                  <span class="c1"># type: bool</span>
+    <span class="n">dryrun</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                    <span class="c1"># type: bool</span>
+    <span class="c1"># database</span>
+    <span class="n">db_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                   <span class="c1"># type: Union[str, Path]</span>
+    <span class="n">dep_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                  <span class="c1"># type: Union[str, Path]</span>
+    <span class="n">backend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                   <span class="c1"># type: str</span>
+    <span class="c1"># verbosities</span>
+    <span class="n">verbosity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                 <span class="c1"># type: int</span>
+    <span class="n">failure_verbosity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>         <span class="c1"># type: int</span>
+    <span class="c1"># output and working dir</span>
+    <span class="n">outfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                   <span class="c1"># type: Union[str, Path]</span>
+    <span class="n">reporter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                  <span class="c1"># type: Union[str, Type]</span>
+    <span class="nb">dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                       <span class="c1"># type: Union[str, Path]</span>
+    <span class="c1"># parallel processing</span>
+    <span class="n">num_process</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>               <span class="c1"># type: int</span>
+    <span class="n">parallel_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>             <span class="c1"># type: str</span>
+    <span class="c1"># misc</span>
+    <span class="n">check_file_uptodate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>       <span class="c1"># type: str</span>
+    <span class="n">pdb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                       <span class="c1"># type: bool</span>
+    <span class="n">codec_cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                 <span class="c1"># type: Type</span>
+    <span class="n">minversion</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                <span class="c1"># type: Union[str, Tuple[int, int, int]]</span>
+    <span class="n">auto_delayed_regex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>        <span class="c1"># type: bool</span>
+    <span class="n">action_string_formatting</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: str</span>
+<span class="p">):</span>
+</code></pre></div>
+
+
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><code>default_tasks</code>: The list of tasks to run when no task names are specified in the commandline. By default all tasks are run. See https://pydoit.org/tasks.html#task-selection</p>
+</li>
+<li>
+<p><code>single</code>: set this to true to execute only specified tasks ignoring their task_dep. Default: <code>False</code></p>
+</li>
+<li>
+<p><code>continue_</code>: by default the execution of tasks is halted on the first task failure or error. You can force it to continue execution by setting this to True. See https://pydoit.org/cmd_run.html#continue</p>
+</li>
+<li>
+<p><code>always</code>: set this to True to always execute tasks even if up-to-date (default: False)</p>
+</li>
+<li>
+<p><code>cleanforget</code>: a boolean, set this to true (default: False) if you like to also make doit forget previous execution of cleaned tasks. See https://pydoit.org/cmd_other.html#clean</p>
+</li>
+<li>
+<p><code>cleandep</code>: By default if a task contains task-dependencies those are not automatically cleaned too. Set this flag to True to do it. Note that if you execute the default tasks, this is set to True by default. See https://pydoit.org/cmd_other.html#clean</p>
+</li>
+<li>
+<p><code>dryrun</code>: a boolean (default False), telling doit to print actions without really executing them. See https://pydoit.org/cmd_other.html#dry-run</p>
+</li>
+<li>
+<p><code>db_file</code>: an alias for dep_file</p>
+</li>
+<li>
+<p><code>dep_file</code>: sets the name of the file to save the "DB", default is .doit.db. Note that DBM backends might save more than one file, in this case the specified name is used as a base name. See https://pydoit.org/cmd_run.html#db-file</p>
+</li>
+<li>
+<p><code>backend</code>: The backend used by pydoit to store the execution states and results. A string that can be any of 'dbm' (default), 'json' (slow but good for debugging), 'sqlite3' (supports concurrent access). Other choices may be available if you install doit plugins adding backends (e.g. redit...). See https://pydoit.org/cmd_run.html#db-backend</p>
+</li>
+<li>
+<p><code>verbosity</code>: An integer defining the verbosity level. Default is 1. See https://pydoit.org/tasks.html#verbosity</p>
+<ul>
+<li>0 capture (do not print) stdout/stderr from task,</li>
+<li>1 capture stdout only,</li>
+<li>2 do not capture anything (print everything immediately).</li>
+</ul>
+</li>
+<li>
+<p><code>failure_verbosity</code>: Option to control if stdout/stderr should be re-displayed in the end of of report. This is useful when used in conjunction with the <code>continue</code> option. Default: 0. See https://pydoit.org/cmd_run.html#failure-verbosity</p>
+</li>
+<li>
+<p>0 do not show re-display</p>
+</li>
+<li>1 re-display stderr only</li>
+<li>
+<p>2 re-display both stderr/stdout</p>
+</li>
+<li>
+<p><code>outfile</code>: output file where to write the results to. Default is stdout. See https://pydoit.org/cmd_run.html#output-file</p>
+</li>
+<li>
+<p><code>reporter</code>: choice of reporter for the console. Can be a string indicating a reporter included in doit, or a class. See https://pydoit.org/cmd_run.html#reporter and https://pydoit.org/cmd_run.html#custom-reporter. Supported string values are </p>
+</li>
+<li>
+<p>'console' (default), </p>
+</li>
+<li>'executed-only' (Produces zero output if no task is executed),</li>
+<li>'json' (Output results in JSON format)</li>
+<li>
+<p>'zero' (display only error messages (does not display info on tasks being executed/skipped). This is used when you only want to see the output generated by the tasks execution.)</p>
+</li>
+<li>
+<p><code>dir</code>: By default the directory of the dodo file is used as the "current working directory" on python execution. You can specify a different cwd with this argument. See https://pydoit.org/cmd_run.html#dir-cwd</p>
+</li>
+<li>
+<p><code>num_process</code>: the number of parallel execution processes to use. Default 1. See https://pydoit.org/cmd_run.html#parallel-execution</p>
+</li>
+<li>
+<p><code>parallel_type</code>: the type of parallelism mechanism used when process is set to a number larger than 1. A string one of 'thread' (uses threads) and 'process' (uses python multiprocessing module, default).</p>
+</li>
+<li>
+<p><code>check_file_uptodate</code>: a string indicating how to check if files have been modified. See https://pydoit.org/cmd_run.html#check-file-uptodate</p>
+</li>
+<li>
+<p>'md5': use the md5sum (default)</p>
+</li>
+<li>
+<p>'timestamp': use the timestamp. </p>
+</li>
+<li>
+<p><code>pdb</code>: set this to True to get into PDB (python debugger) post-mortem in case of unhandled exception. Default: False. See https://pydoit.org/cmd_run.html#pdb</p>
+</li>
+<li>
+<p><code>codec_cls</code>: a class used to serialize and deserialize values returned by python-actions. Default <code>JSONCodec</code>. See https://pydoit.org/cmd_run.html#codec-cls</p>
+</li>
+<li>
+<p><code>minversion</code>: an optional string or a 3-element tuple with integer values indicating the minimum/oldest doit version that can be used with a dodo.py file. If specified as a string any part that is not a number i.e.(dev0, a2, b4) will be converted to -1. See https://pydoit.org/cmd_run.html#minversion</p>
+</li>
+<li>
+<p><code>auto_delayed_regex</code>: set this to True (default False) to use the default regex ".*" for every delayed task loader for which no regex was explicitly defined. See https://pydoit.org/cmd_run.html#automatic-regex-for-delayed-task-loaders</p>
+</li>
+<li>
+<p><code>action_string_formatting</code>: Defines the templating style used by your cmd action strings for automatic variable substitution. It is a string that can be 'old' (default), 'new', or 'both'. See https://pydoit.org/tasks.html#keywords-on-cmd-action-string</p>
+</li>
+</ul>
+<p><strong>Outputs</strong></p>
+<p><code>config_dict</code>: a configuration dictionary that you can use as the DOIT_CONFIG variable in your dodo.py file</p>
+<h3 id="task"><code>task</code><a class="headerlink" href="#task" title="Permanent link">&para;</a></h3>
+<p>Creates a doit task.</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">doit_api</span> <span class="kn">import</span> <span class="n">task</span>
+
+<span class="n">echoer</span> <span class="o">=</span> <span class="n">task</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;echoer&quot;</span><span class="p">,</span> <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;echo hi&quot;</span><span class="p">],</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;the doc for echoer&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>It signature regroups all options that you usually can set on a <code>doit</code> task, with sensible defaults. </p>
+<p>A minimal <code>doit</code> task consists of one or several actions. You must provide at least one action in <code>actions</code>. If <code>tell_why_i_am_runnin=True</code> (default) an additional action will be prepended to print the reason why the task is running if the task declared a <code>file_dep</code>, <code>task_dep</code>, <code>uptodate</code> or <code>targets</code>.</p>
 <p>All other parameters match those in <code>doit</code> conventions (See parameters below), except</p>
 <ul>
 <li><code>name</code> that is an intelligent placeholder for <code>basename</code> (if a task is a simple task) or <code>name</code> (if the task is a subtask in a <code>@taskgen</code> generator),</li>
 <li><code>title</code> that adds support for plain strings and by default is <code>title_with_actions</code>,</li>
-<li><code>task_dep</code>, <code>setup</code> and <code>calc_dep</code> where if a task callable (decorated with <code>@task</code> or not) is provided, the corresponding name will be used.</li>
+<li><code>task_dep</code>, <code>setup</code> and <code>calc_dep</code> where if a task callable (decorated with <code>@pytask</code> or not) is provided, the corresponding name will be used.</li>
 </ul>
 <p>Note: the <code>watch</code> parameter (Linux and Mac only) is not yet supported.
 See [doit doc](https://pydoit.org/cmd_other.html?highlight=watch#auto-watch</p>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">task</span><span class="p">(</span>
- <span class="c1"># -- task information</span>
- <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>   <span class="c1"># type: str</span>
- <span class="n">doc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>    <span class="c1"># type: str</span>
- <span class="c1"># -- what the task is doing when run</span>
- <span class="n">title</span><span class="o">=</span><span class="n">title_with_actions</span><span class="p">,</span>    <span class="c1"># type: Union[str, Callable]</span>
- <span class="n">pre_actions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>    <span class="c1"># type: List[DoitAction]</span>
- <span class="n">actions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>        <span class="c1"># type: List[DoitAction]</span>
- <span class="n">post_actions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>   <span class="c1"># type: List[DoitAction]</span>
- <span class="n">tell_why_am_i_running</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
- <span class="c1"># -- preventing useless runs and selecting order</span>
- <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>        <span class="c1"># type: List[DoitPath]</span>
- <span class="n">file_dep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>       <span class="c1"># type: List[DoitPath]</span>
- <span class="n">task_dep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>       <span class="c1"># type: List[DoitTask]</span>
- <span class="n">uptodate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>       <span class="c1"># type: List[Optional[Union[bool, Callable, str]]]</span>
- <span class="c1"># -- advanced</span>
- <span class="n">setup</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: List[DoitTask]</span>
- <span class="n">teardown</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>       <span class="c1"># type: List[DoitAction]</span>
- <span class="n">getargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>        <span class="c1"># type: Dict[str, Tuple[str, str]]</span>
- <span class="n">calc_dep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>       <span class="c1"># type: List[DoitTask]</span>
- <span class="c1"># -- misc</span>
- <span class="n">verbosity</span><span class="o">=</span><span class="kc">None</span>       <span class="c1"># type: int</span>
- <span class="p">)</span>
+     <span class="c1"># -- task information + what the task is doing when run</span>
+     <span class="n">name</span><span class="p">,</span>                        <span class="c1"># type: str</span>
+     <span class="n">actions</span><span class="p">,</span>                     <span class="c1"># type: List[DoitAction]</span>
+     <span class="n">doc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                    <span class="c1"># type: str</span>
+     <span class="n">title</span><span class="o">=</span><span class="n">title_with_actions</span><span class="p">,</span>    <span class="c1"># type: Union[str, Callable]</span>
+     <span class="n">tell_why_am_i_running</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
+     <span class="c1"># -- preventing useless runs and selecting order</span>
+     <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                <span class="c1"># type: List[DoitPath]</span>
+     <span class="n">file_dep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>               <span class="c1"># type: List[DoitPath]</span>
+     <span class="n">task_dep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>               <span class="c1"># type: List[DoitTask]</span>
+     <span class="n">uptodate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>               <span class="c1"># type: List[Optional[Union[bool, Callable, str]]]</span>
+     <span class="c1"># -- advanced</span>
+     <span class="n">setup</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                  <span class="c1"># type: List[DoitTask]</span>
+     <span class="n">teardown</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>               <span class="c1"># type: List[DoitAction]</span>
+     <span class="n">getargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                <span class="c1"># type: Dict[str, Tuple[str, str]]</span>
+     <span class="n">calc_dep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>               <span class="c1"># type: List[DoitTask]</span>
+     <span class="c1"># -- misc</span>
+     <span class="n">verbosity</span><span class="o">=</span><span class="kc">None</span>               <span class="c1"># type: int</span>
+<span class="p">)</span>
+</code></pre></div>
+
+
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>
+<p><code>name</code>: a mandatory name for the task. Note that this parameter will intelligently set 'basename' for normal tasks or 'name' for subtasks in a task generator (<code>@taskgen</code>). See <a href="https://pydoit.org/tasks.html#task-name">doit doc</a></p>
+</li>
+<li>
+<p><code>actions</code>: a mandatory list of actions that this task should execute. There are 2 basic kinds of actions: cmd-action and python-action. See <a href="https://pydoit.org/tasks.html#actions">doit doc</a></p>
+</li>
+<li>
+<p><code>doc</code>: an optional documentation string for the task. See <a href="https://pydoit.org/tasks.html#doc">doit doc</a></p>
+</li>
+<li>
+<p><code>title</code>: an optional message string or callable generating a message, to print when the task is run. If nothing is provided, by default the task name is printed. If a string is provided, the task name will automatically be printed before it. If a callable is provided it should receive a single <code>task</code> argument and return a string. See <a href="https://pydoit.org/tasks.html#title">doit doc</a></p>
+</li>
+<li>
+<p><code>tell_why_am_i_running</code>: if True (default), an additional <code>why_am_i_running</code> action is prepended to the list of actions</p>
+</li>
+<li>
+<p><code>file_dep</code>: an optional list of strings or instances of any pathlib Path class indicating the files required for this task to run. When none of these files are modified, the task will be skipped if already run. See <a href="https://pydoit.org/tasks.html#file-dep-file-dependency">doit doc</a></p>
+</li>
+<li>
+<p><code>task_dep</code>: an optional list of tasks (names or callables) that should be run <em>before</em> this task. Note that this is also a convenient way to create a group of tasks. See <a href="https://pydoit.org/dependencies.html#task-dependency">doit doc</a></p>
+</li>
+<li>
+<p><code>uptodate</code>: an optional list where each element can be True (up to date), False (not up to date), None (ignored), a callable or a command(string). Many pre-baked callables from <code>doit.tools</code> can be used: <code>result_dep</code> to depend on the result of another task, <code>run_once</code> to run only once, <code>timeout</code> for time-based expiration, <code>config_changed</code> for changes in a “configuration” string or dictionary, and more... See <a href="https://pydoit.org/dependencies.html#uptodate">doit doc</a></p>
+</li>
+<li>
+<p><code>targets</code>: an optional list of strings or instances of any pathlib Path class indicating the files created by the task. They can be any file path (a file or folder). If a target does not exist the task will be executed. Two different tasks <em>can not</em> have the same target. See <a href="https://pydoit.org/tasks.html#targets">doit doc</a></p>
+</li>
+<li>
+<p><code>setup</code>: tasks to be run before this task but only when it is run. See <a href="https://pydoit.org/dependencies.html#setup-task">doit doc</a></p>
+</li>
+<li>
+<p><code>teardown</code>: actions to run once all tasks are completed. See <a href="https://pydoit.org/dependencies.html#setup-task">doit doc</a></p>
+</li>
+<li>
+<p><code>getargs</code>: an optional dictionary where the key is the argument name used on actions, and the value is a tuple with 2 strings: task name, “value name”. getargs provides a way to use values computed from one task in another task. See <a href="https://pydoit.org/dependencies.html#getargs">doit doc</a></p>
+</li>
+<li>
+<p><code>calc_dep</code>: See <a href="https://pydoit.org/dependencies.html#calculated-dependencies">doit doc</a></p>
+</li>
+<li>
+<p><code>verbosity</code>: an optional custom verbosity level (0, 1, or 2) for this task. See <a href="https://pydoit.org/tasks.html#verbosity">doit doc</a></p>
+</li>
+</ul>
+<p>Note: this relies on the <code>create_doit_tasks</code> hook, see <a href="https://pydoit.org/task_creation.html#custom-task-definition">here</a></p>
+<h3 id="pytask"><code>@pytask</code><a class="headerlink" href="#pytask" title="Permanent link">&para;</a></h3>
+<p>A decorator to create a task containing a python action (the decorated function), and optional additional actions.</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">doit_api</span> <span class="kn">import</span> <span class="n">pytask</span>
+
+<span class="nd">@pytask</span>
+<span class="k">def</span> <span class="nf">a</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; the doc for a &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+
+<span class="nd">@pytask</span><span class="p">(</span><span class="n">targets</span><span class="o">=...</span><span class="p">,</span> <span class="n">file_deps</span><span class="o">=...</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">b</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>A minimal <code>doit</code> task consists of one or several actions. Here, the main action is a call to the decorated function. You can specify actions to be done before and after that/these <code>actions</code> in <code>pre_actions</code> and <code>post_actions</code>.</p>
+<p>If <code>tell_why_i_am_runnin=True</code> (default) an additional action will be prepended to print the reason why the task is running if the task declared a <code>file_dep</code>, <code>task_dep</code>, <code>uptodate</code> or <code>targets</code>.</p>
+<p>All other parameters match those in <code>doit</code> conventions (See parameters below), except</p>
+<ul>
+<li><code>name</code> that is an intelligent placeholder for <code>basename</code> (if a task is a simple task) or <code>name</code> (if the task is a subtask in a <code>@taskgen</code> generator),</li>
+<li><code>title</code> that adds support for plain strings and by default is <code>title_with_actions</code>,</li>
+<li><code>task_dep</code>, <code>setup</code> and <code>calc_dep</code> where if a task callable (decorated with <code>@pytask</code> or not) is provided, the corresponding name will be used.</li>
+</ul>
+<p>Note: the <code>watch</code> parameter (Linux and Mac only) is not yet supported.
+See [doit doc](https://pydoit.org/cmd_other.html?highlight=watch#auto-watch</p>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">pytask</span><span class="p">(</span>
+     <span class="c1"># -- task information</span>
+     <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                   <span class="c1"># type: str</span>
+     <span class="n">doc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                    <span class="c1"># type: str</span>
+     <span class="c1"># -- what the task is doing when run</span>
+     <span class="n">title</span><span class="o">=</span><span class="n">title_with_actions</span><span class="p">,</span>    <span class="c1"># type: Union[str, Callable]</span>
+     <span class="n">pre_actions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>            <span class="c1"># type: List[DoitAction]</span>
+     <span class="n">post_actions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>           <span class="c1"># type: List[DoitAction]</span>
+     <span class="n">tell_why_am_i_running</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
+     <span class="c1"># -- preventing useless runs and selecting order</span>
+     <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                <span class="c1"># type: List[DoitPath]</span>
+     <span class="n">file_dep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>               <span class="c1"># type: List[DoitPath]</span>
+     <span class="n">task_dep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>               <span class="c1"># type: List[DoitTask]</span>
+     <span class="n">uptodate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>               <span class="c1"># type: List[Optional[Union[bool, Callable, str]]]</span>
+     <span class="c1"># -- advanced</span>
+     <span class="n">setup</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                  <span class="c1"># type: List[DoitTask]</span>
+     <span class="n">teardown</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>               <span class="c1"># type: List[DoitAction]</span>
+     <span class="n">getargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                <span class="c1"># type: Dict[str, Tuple[str, str]]</span>
+     <span class="n">calc_dep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>               <span class="c1"># type: List[DoitTask]</span>
+     <span class="c1"># -- misc</span>
+     <span class="n">verbosity</span><span class="o">=</span><span class="kc">None</span>               <span class="c1"># type: int</span>
+<span class="p">)</span>
 </code></pre></div>
 
 
@@ -397,16 +653,13 @@ See [doit doc](https://pydoit.org/cmd_other.html?highlight=watch#auto-watch</p>
 <p><code>name</code>: an alternate name for the task. By default the name of the decorated function is used. Note that this parameter will intelligently set 'basename' for normal tasks or 'name' for subtasks in a task generator (<code>@taskgen</code>). See <a href="https://pydoit.org/tasks.html#task-name">doit doc</a></p>
 </li>
 <li>
-<p><code>doc</code>: an optional documentation string for the task. If <code>@task</code> is used as a decorator, the decorated function docstring will be used. See <a href="https://pydoit.org/tasks.html#doc">doit doc</a></p>
+<p><code>doc</code>: an optional documentation string for the task. By default, the decorated function docstring will be used. See <a href="https://pydoit.org/tasks.html#doc">doit doc</a></p>
 </li>
 <li>
 <p><code>title</code>: an optional message string or callable generating a message, to print when the task is run. If nothing is provided, by default the task name is printed. If a string is provided, the task name will automatically be printed before it. If a callable is provided it should receive a single <code>task</code> argument and return a string. See <a href="https://pydoit.org/tasks.html#title">doit doc</a></p>
 </li>
 <li>
 <p><code>pre_actions</code>: an optional list of actions to be executed before the main action(s). There are 2 basic kinds of actions: cmd-action and python-action. See <a href="https://pydoit.org/tasks.html#actions">doit doc</a></p>
-</li>
-<li>
-<p><code>actions</code>: a list of actions that this task should execute. If <code>task</code> is used as a decorator, this attribute should not be set, as the action will be a call to the decorated function. There are 2 basic kinds of actions: cmd-action and python-action. See <a href="https://pydoit.org/tasks.html#actions">doit doc</a></p>
 </li>
 <li>
 <p><code>post_actions</code>: an optional list of actions to be executed after the main action(s). There are 2 basic kinds of actions: cmd-action and python-action. See <a href="https://pydoit.org/tasks.html#actions">doit doc</a></p>
@@ -559,7 +812,7 @@ See [doit doc](https://pydoit.org/cmd_other.html?highlight=watch#auto-watch</p>
     </div>
     
       <script src="../assets/javascripts/vendor.3636a4ec.min.js"></script>
-      <script src="../assets/javascripts/bundle.e9fe3281.min.js"></script><script id="__lang" type="application/json">{"search.config.separator": "[\\s\\-]+", "search.config.lang": "en", "clipboard.copied": "Copied to clipboard", "search.config.pipeline": "trimmer, stopWordFilter", "clipboard.copy": "Copy to clipboard", "search.result.none": "No matching documents", "search.result.placeholder": "Type to start searching", "search.result.other": "# matching documents", "search.result.one": "1 matching document"}</script>
+      <script src="../assets/javascripts/bundle.e9fe3281.min.js"></script><script id="__lang" type="application/json">{"search.config.separator": "[\\s\\-]+", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.result.one": "1 matching document", "search.result.none": "No matching documents", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter"}</script>
       
       <script>
         app = initialize({
