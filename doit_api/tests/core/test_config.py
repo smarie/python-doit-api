@@ -95,14 +95,15 @@ Command %(failed)s: 'ech hi' returned %(failed_code)s
 Command %(failed)s: 'ech hi' returned %(failed_code)s
 
 a <stderr>:
-'ech' is not recognized as an internal or external command,
-operable program or batch file.
+%(errmsg)s
 
 a <stdout>:
 
 """ % dict(failed_type='TaskFailed' if win else 'TaskError',
            failed='failed' if win else 'error',
-           failed_code=1 if win else 127)
+           failed_code=1 if win else 127,
+           errmsg="'ech' is not recognized as an internal or external command,\n"
+                  "operable program or batch file." if win else "/bin/sh: 1: ech: not found")
     else:
         assert out_str == """.  a => Cmd: ech hi
 .  b => Cmd: echo hi
@@ -110,9 +111,10 @@ a <stdout>:
 %(failed_type)s - taskid:a
 Command %(failed)s: 'ech hi' returned %(failed_code)s
 
-'ech' is not recognized as an internal or external command,
-operable program or batch file.
+%(errmsg)s
 
 """ % dict(failed_type='TaskFailed' if win else 'TaskError',
            failed='failed' if win else 'error',
-           failed_code=1 if win else 127)
+           failed_code=1 if win else 127,
+           errmsg="'ech' is not recognized as an internal or external command, \n"
+                  "operable program or batch file." if win else "/bin/sh: 1: ech: not found")
