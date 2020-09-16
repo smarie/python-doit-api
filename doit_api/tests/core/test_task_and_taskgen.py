@@ -1,4 +1,3 @@
-import pytest
 import sys
 
 try:
@@ -12,18 +11,18 @@ from doit.cmd_list import List
 from doit.cmd_run import Run
 from doit_api.tests.conftest import CmdFactory
 
-from doit_api import task, taskgen, why_am_i_running
+from doit_api import task, taskgen, pytask, why_am_i_running
 
 
 def test_task(monkeypatch, depfile_name, capsys):
     """Tests that our various task generation mechanisms work"""
 
-    @task(title="custom title")
+    @pytask(title="custom title")
     def a():
         """ hey """
         print("hello !")
 
-    @task(task_dep=[a])
+    @pytask(task_dep=[a])
     def b():
         """ hey! """
         print("hello !!")
@@ -39,13 +38,13 @@ def test_task(monkeypatch, depfile_name, capsys):
         def c_():
             """here is a doc"""
             print("hello")
-        yield task(c_)
+        yield pytask(c_)
 
         for i in range(2):
             # python task - decorator style
-            @task(name="subtask %i" % i,
-                  doc="a subtask %s" % i,
-                  title="this is %s running" % i)
+            @pytask(name="subtask %i" % i,
+                    doc="a subtask %s" % i,
+                    title="this is %s running" % i)
             def c_():
                 print("hello sub")
             yield c_
@@ -53,10 +52,9 @@ def test_task(monkeypatch, depfile_name, capsys):
             # python task - non-decorator style
             def d_():
                 print("hello variant")
-            yield task(d_,
-                       name="subtask %i variant" % i,
-                       doc="a subtask %s variant" % i,
-                       title="this is %s running variant" % i)
+            yield pytask(name="subtask %i variant" % i,
+                         doc="a subtask %s variant" % i,
+                         title="this is %s running variant" % i)(d_)
 
     if sys.version_info < (3, 0):
         # doit version is 0.29 on python 2. Internal api is different.
@@ -75,9 +73,9 @@ def test_task(monkeypatch, depfile_name, capsys):
         assert len(task_a) == 1
         task_a = task_a[0]
         assert task_a.name == 'a'
-        assert task_a.doc == a.func.__doc__.strip()
+        assert task_a.doc == a.__doc__.strip()
         assert task_a.actions[0].py_callable == why_am_i_running
-        assert task_a.actions[1].py_callable == a.func
+        assert task_a.actions[1].py_callable == a
         assert task_a.title() == 'a => custom title'
 
         # task b dependency
@@ -126,7 +124,7 @@ c:subtask 1 variant   a subtask 1 variant
     with capsys.disabled():
         assert captured.out.replace("\r", "") == """hello !
 hello !!
-Running <Task: c:echo> because one of its targets does not exist anymore: 'hoho.txt'
+Running <Task: c:echo> because one of its targets does not exist: 'hoho.txt'
 hi
 hello
 hello sub
@@ -172,7 +170,7 @@ c:subtask 1 variant   a subtask 1 variant
         with capsys.disabled():
             assert captured.out.replace("\r", "") == """hello !
 hello !!
-Running <Task: c:echo> because one of its targets does not exist anymore: 'hoho.txt'
+Running <Task: c:echo> because one of its targets does not exist: 'hoho.txt'
 hi
 hello
 hello sub
