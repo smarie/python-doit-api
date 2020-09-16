@@ -64,7 +64,8 @@ def test_valid_config(monkeypatch, depfile_name):
         # run
         run(locals())
     except SystemExit as err:
-        assert err.code == 1, "doit execution error"
+        # error code seems to be 1 on windows and 2 on linux (travis)
+        assert err.code >= 1, "doit execution error"
     else:  # pragma: no cover
         assert False, "Did not receive SystemExit - should not happen"
 
