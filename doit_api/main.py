@@ -49,9 +49,16 @@ def doit_config(
                 action_string_formatting=None,  # type: str
                 ):
     """
-    Generates a valid DOIT_CONFIG dictionary, that can contain GLOBAL options.
-    Almost all command line options can be changed here.
+    Generates a valid DOIT_CONFIG dictionary, that can contain GLOBAL options. You can use it at the beginning of your
+    `dodo.py` file:
 
+    ```python
+    from doit_api import doit_config
+
+    DOIT_CONFIG = doit_config(verbosity=2)
+    ```
+
+    Almost all command line options can be changed here.
     See https://pydoit.org/configuration.html#configuration-at-dodo-py
 
     :param default_tasks: The list of tasks to run when no task names are specified in the commandline. By default
@@ -352,7 +359,7 @@ class task(taskbase):
     ```python
     from doit_api import task
 
-    c = task(name="echoer", actions=["echo hi"], doc="the doc for e")
+    echoer = task(name="echoer", actions=["echo hi"], doc="the doc for echoer")
     ```
 
     It signature regroups all options that you usually can set on a `doit` task, with sensible defaults. See constructor
@@ -385,8 +392,8 @@ class task(taskbase):
                  ):
         """
         A minimal `doit` task consists of one or several actions. You must provide at least one action in `actions`.
-        If `tell_why_i_am_runnin=True` (default) an additional action will be prepended to print the reason why the
-        task is running.
+        If `tell_why_i_am_running=True` (default) an additional action will be prepended to print the reason why the
+        task is running if the task declared a `file_dep`, `task_dep`, `uptodate` or `targets`.
 
         All other parameters match those in `doit` conventions (See docstrings below), except
 
@@ -652,23 +659,7 @@ def pytask(
            verbosity=None               # type: int
            ):
     """
-    A decorator to create a task containing a python action (the decorated function).
-
-    A minimal `doit` task consists of one or several actions. Here, the main action is a call to the decorated function.
-    You can specify actions to be done before and after that/these `actions` in `pre_actions` and `post_actions`.
-    If `tell_why_i_am_runnin=True` (default) an additional action will be prepended to print the reason why the task is
-    running.
-
-    All other parameters match those in `doit` conventions (See docstrings below), except
-
-     - `name` that is an intelligent placeholder for `basename` (if a task is a simple task) or `name` (if the task
-       is a subtask in a `@taskgen` generator),
-     - `title` that adds support for plain strings and by default is `title_with_actions`
-     - `task_dep`, `setup` and `calc_dep` where if a task callable (decorated with `@task` or not) is provided, the
-       corresponding name will be used.
-
-    Note: the `watch` parameter (Linux and Mac only) is not yet supported.
-    See https://pydoit.org/cmd_other.html?highlight=watch#auto-watch
+    A decorator to create a task containing a python action (the decorated function), and optional additional actions.
 
     ```python
     from doit_api import pytask
@@ -681,15 +672,29 @@ def pytask(
     @pytask(targets=..., file_deps=..., ...)
     def b():
         print("hi")
-
-    c = task(name="echoer", actions=["echo hi"], doc="the doc for e")
     ```
+
+    A minimal `doit` task consists of one or several actions. Here, the main action is a call to the decorated function.
+    You can specify actions to be done before and after that/these `actions` in `pre_actions` and `post_actions`.
+    If `tell_why_i_am_running=True` (default) an additional action will be prepended to print the reason why the
+    task is running if the task declared a `file_dep`, `task_dep`, `uptodate` or `targets`.
+
+    All other parameters match those in `doit` conventions (See docstrings below), except
+
+     - `name` that is an intelligent placeholder for `basename` (if a task is a simple task) or `name` (if the task
+       is a subtask in a `@taskgen` generator),
+     - `title` that adds support for plain strings and by default is `title_with_actions`
+     - `task_dep`, `setup` and `calc_dep` where if a task callable (decorated with `@task` or not) is provided, the
+       corresponding name will be used.
+
+    Note: the `watch` parameter (Linux and Mac only) is not yet supported.
+    See https://pydoit.org/cmd_other.html?highlight=watch#auto-watch
 
     :param name: an alternate name for the task. By default the name of the decorated function is used. Note that
         this parameter will intelligently set 'basename' for normal tasks or 'name' for subtasks in a task
         generator (`@taskgen`). See https://pydoit.org/tasks.html#task-name
-    :param doc: an optional documentation string for the task. If `@task` is used as a decorator, the decorated
-        function docstring will be used. See https://pydoit.org/tasks.html#doc
+    :param doc: an optional documentation string for the task. By default, the decorated function docstring will
+        be used. See https://pydoit.org/tasks.html#doc
     :param title: an optional message string or callable generating a message, to print when the task is run. If
         nothing is provided, by default the task name is printed. If a string is provided, the task name will
         automatically be printed before it. If a callable is provided it should receive a single `task` argument
