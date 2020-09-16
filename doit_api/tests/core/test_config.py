@@ -1,7 +1,6 @@
 import json
-
 import os
-
+import platform
 import sys
 
 import pytest
@@ -84,15 +83,16 @@ def test_valid_config(monkeypatch, depfile_name):
         out_str = f.read()
     os.remove("tmp_out.txt")
 
+    win = platform.system() == "Windows"
     if sys.version_info > (3, 0):
         assert out_str == """.  a => Cmd: ech hi
 .  b => Cmd: echo hi
 TaskFailed - taskid:a
-Command failed: 'ech hi' returned 1
+Command %(failed)s: 'ech hi' returned %(failed_code)s
 
 ########################################
 TaskFailed - taskid:a
-Command failed: 'ech hi' returned 1
+Command %(failed)s: 'ech hi' returned %(failed_code)s
 
 a <stderr>:
 'ech' is not recognized as an internal or external command,
@@ -100,15 +100,15 @@ operable program or batch file.
 
 a <stdout>:
 
-"""
+""" % dict(failed='failed' if win else 'error', failed_code=1 if win else 127)
     else:
         assert out_str == """.  a => Cmd: ech hi
 .  b => Cmd: echo hi
 ########################################
 TaskFailed - taskid:a
-Command failed: 'ech hi' returned 1
+Command %(failed)s: 'ech hi' returned %(failed_code)s
 
 'ech' is not recognized as an internal or external command,
 operable program or batch file.
 
-"""
+""" % dict(failed='failed' if win else 'error', failed_code=1 if win else 127)
