@@ -14,6 +14,177 @@ except ImportError:
 from doit.action import CmdAction
 
 
+# --- configuration
+def doit_config(
+                # execution related
+                default_tasks=None,             # type: List[str]
+                single=None,                    # type: bool
+                continue_=None,                 # type: bool
+                always=None,                    # type: bool
+                cleanforget=None,               # type: bool
+                cleandep=None,                  # type: bool
+                dryrun=None,                    # type: bool
+                # database
+                db_file=None,                   # type: Union[str, Path]
+                dep_file=None,                  # type: Union[str, Path]
+                backend=None,                   # type: str
+                # verbosities
+                verbosity=None,                 # type: int
+                failure_verbosity=None,         # type: int
+                # output and working dir
+                outfile=None,                   # type: Union[str, Path]
+                reporter=None,                  # type: Union[str, Type]
+                dir=None,                       # type: Union[str, Path]
+                # parallel processing
+                num_process=None,               # type: int
+                parallel_type=None,             # type: str
+                # misc
+                check_file_uptodate=None,       # type: str
+                pdb=None,                       # type: bool
+                codec_cls=None,                 # type: Type
+                minversion=None,                # type: Union[str, Tuple[int, int, int]]
+                auto_delayed_regex=None,        # type: bool
+                action_string_formatting=None,  # type: str
+                ):
+    """
+    Generates a valid DOIT_CONFIG dictionary, that can contain GLOBAL options.
+    Almost all command line options can be changed here.
+
+    See https://pydoit.org/configuration.html#configuration-at-dodo-py
+
+    :param default_tasks: The list of tasks to run when no task names are specified in the commandline. By default
+        all tasks are run. See https://pydoit.org/tasks.html#task-selection
+    :param single: set this to true to execute only specified tasks ignoring their task_dep. Default: False
+    :param continue_: by default the execution of tasks is halted on the first task failure or error. You can force it
+        to continue execution by setting this to True. See https://pydoit.org/cmd_run.html#continue
+    :param always: set this to True to always execute tasks even if up-to-date (default: False)
+    :param cleanforget: a boolean, set this to true (default: False) if you like to also make doit forget previous
+        execution of cleaned tasks. See https://pydoit.org/cmd_other.html#clean
+    :param cleandep: By default if a task contains task-dependencies those are not automatically cleaned too. Set this
+        flag to True to do it. Note that if you execute the default tasks, this is set to True by default.
+        See https://pydoit.org/cmd_other.html#clean
+    :param dryrun: a boolean (default False), telling doit to print actions without really executing them.
+        See https://pydoit.org/cmd_other.html#dry-run
+    :param db_file: an alias for dep_file
+    :param dep_file: sets the name of the file to save the "DB", default is .doit.db. Note that DBM backends might save
+        more than one file, in this case the specified name is used as a base name.
+        See https://pydoit.org/cmd_run.html#db-file
+    :param backend: The backend used by pydoit to store the execution states and results. A string that can be any of
+        'dbm' (default), 'json' (slow but good for debugging), 'sqlite3' (supports concurrent access).
+        Other choices may be available if you install doit plugins adding backends (e.g. redit...).
+        See https://pydoit.org/cmd_run.html#db-backend
+    :param verbosity: An integer defining the verbosity level:
+        0 capture (do not print) stdout/stderr from task,
+        1 capture stdout only,
+        2 do not capture anything (print everything immediately).
+        Default is 1. See https://pydoit.org/tasks.html#verbosity
+    :param failure_verbosity: Option to control if stdout/stderr should be re-displayed in the end of of report. This
+        is useful when used in conjunction with the `continue` option. Default: 0
+        0 do not show re-display
+        1 re-display stderr only
+        2 re-display both stderr/stdout
+        See https://pydoit.org/cmd_run.html#failure-verbosity
+    :param outfile: output file where to write the results to. Default is stdout.
+        See https://pydoit.org/cmd_run.html#output-file
+    :param reporter: choice of reporter for the console. Can be a string indicating a reporter included in doit, or
+        a class. Supported string values are
+        'console' (default),
+        'executed-only' (Produces zero output if no task is executed),
+        'json' (Output results in JSON format)
+        'zero' (display only error messages (does not display info on tasks being executed/skipped). This is used when
+        you only want to see the output generated by the tasks execution.)
+        see https://pydoit.org/cmd_run.html#reporter and https://pydoit.org/cmd_run.html#custom-reporter
+    :param dir: By default the directory of the dodo file is used as the "current working directory" on python
+        execution. You can specify a different cwd with this argument. See https://pydoit.org/cmd_run.html#dir-cwd
+    :param num_process: the number of parallel execution processes to use. Default 1. See
+        https://pydoit.org/cmd_run.html#parallel-execution
+    :param parallel_type: the type of parallelism mechanism used when process is set to a number larger than 1. A string
+        one of 'thread' (uses threads) and 'process' (uses python multiprocessing module, default).
+    :param check_file_uptodate: a string indicating how to check if files have been modified. 'md5': use the md5sum
+        (default) 'timestamp': use the timestamp. See https://pydoit.org/cmd_run.html#check-file-uptodate
+    :param pdb: set this to True to get into PDB (python debugger) post-mortem in case of unhandled exception.
+        Default: False. See https://pydoit.org/cmd_run.html#pdb
+    :param codec_cls: a class used to serialize and deserialize values returned by python-actions. Default `JSONCodec`.
+        See https://pydoit.org/cmd_run.html#codec-cls
+    :param minversion: an optional string or a 3-element tuple with integer values indicating the minimum/oldest doit
+        version that can be used with a dodo.py file. If specified as a string any part that is not
+        a number i.e.(dev0, a2, b4) will be converted to -1. See https://pydoit.org/cmd_run.html#minversion
+    :param auto_delayed_regex: set this to True (default False) to use the default regex ".*" for every delayed task
+        loader for which no regex was explicitly defined.
+        See https://pydoit.org/cmd_run.html#automatic-regex-for-delayed-task-loaders
+    :param action_string_formatting: Defines the templating style used by your cmd action strings for automatic variable
+        substitution. It is a string that can be 'old' (default), 'new', or 'both'.
+        See https://pydoit.org/tasks.html#keywords-on-cmd-action-string
+    :return: a configuration dictionary that you can use as the DOIT_CONFIG variable in your dodo.py file
+    """
+    config_dict = dict()
+
+    # execution related
+    if default_tasks is not None:
+        # note: yes, not a dash here but an underscore
+        config_dict.update(default_tasks=default_tasks)
+    if single is not None:
+        config_dict.update(single=single)
+    if continue_ is not None:
+        config_dict['continue'] = continue_
+    if always is not None:
+        config_dict.update(always=always)
+    if cleanforget is not None:
+        config_dict.update(cleanforget=cleanforget)
+    if cleandep is not None:
+        config_dict.update(cleandep=cleandep)
+    if dryrun is not None:
+        config_dict.update(dryrun=dryrun)
+
+    # database
+    if db_file is not None:
+        assert dep_file is None, "db_file and dep_file are equivalent, you should not specify both"
+        dep_file = db_file
+    if dep_file is not None:
+        # note: yes, not a dash here but an underscore
+        config_dict.update(dep_file=dep_file)
+    if backend is not None:
+        config_dict.update(backend=backend)
+
+    # verbosities
+    if verbosity is not None:
+        config_dict.update(verbosity=verbosity)
+    if failure_verbosity is not None:
+        # confirmed
+        config_dict.update(failure_verbosity=failure_verbosity)
+
+    # output, reporter and working dir
+    if outfile is not None:
+        # yes, short name
+        config_dict.update(outfile=outfile)
+    if reporter is not None:
+        config_dict.update(reporter=reporter)
+    if dir is not None:
+        config_dict.update(dir=dir)
+
+    # parallel processing
+    if num_process is not None:
+        config_dict.update(num_process=num_process)
+    if parallel_type is not None:
+        config_dict.update(par_type=parallel_type)
+
+    # misc
+    if check_file_uptodate is not None:
+        config_dict.update(check_file_uptodate=check_file_uptodate)
+    if pdb is not None:
+        config_dict.update(pdb=pdb)
+    if codec_cls is not None:
+        config_dict.update(codec_cls=codec_cls)
+    if minversion is not None:
+        config_dict.update(minversion=minversion)
+    if auto_delayed_regex is not None:
+        config_dict.update(auto_delayed_regex=auto_delayed_regex)
+    if action_string_formatting is not None:
+        config_dict.update(action_string_formatting=action_string_formatting)
+
+    return config_dict
+
+
 # --- task utilities
 
 
