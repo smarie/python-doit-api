@@ -87,11 +87,11 @@ def test_valid_config(monkeypatch, depfile_name):
     if sys.version_info > (3, 0):
         assert out_str == """.  a => Cmd: ech hi
 .  b => Cmd: echo hi
-TaskFailed - taskid:a
+%(failed_type)s - taskid:a
 Command %(failed)s: 'ech hi' returned %(failed_code)s
 
 ########################################
-TaskFailed - taskid:a
+%(failed_type)s - taskid:a
 Command %(failed)s: 'ech hi' returned %(failed_code)s
 
 a <stderr>:
@@ -100,15 +100,19 @@ operable program or batch file.
 
 a <stdout>:
 
-""" % dict(failed='failed' if win else 'error', failed_code=1 if win else 127)
+""" % dict(failed_type='TaskFailed' if win else 'TaskError',
+           failed='failed' if win else 'error',
+           failed_code=1 if win else 127)
     else:
         assert out_str == """.  a => Cmd: ech hi
 .  b => Cmd: echo hi
 ########################################
-TaskFailed - taskid:a
+%(failed_type)s - taskid:a
 Command %(failed)s: 'ech hi' returned %(failed_code)s
 
 'ech' is not recognized as an internal or external command,
 operable program or batch file.
 
-""" % dict(failed='failed' if win else 'error', failed_code=1 if win else 127)
+""" % dict(failed_type='TaskFailed' if win else 'TaskError',
+           failed='failed' if win else 'error',
+           failed_code=1 if win else 127)
