@@ -170,14 +170,15 @@ from doit_api import taskgen, pytask
 @taskgen
 def mygroup():
     """ hey !!! """
-    for fp in file_pattern(src_pattern="**/tests/**/[!_]*.py", dst_pattern="%.txt"):
+    for fp in file_pattern("**/tests/**/[!_]*.py", "%.txt"):
         @pytask(name=fp.name,
                 doc=str(fp),
                 file_dep=[fp.src_path],
                 targets=[fp.dst_path],
                 title=str(fp))
         def c_():
-            print(">>> (todo) here you use %r to generate %r" % (fp.src_path, fp.dst_path))
+            print(">>> (todo) here you use %r to generate %r\n" 
+                  % (fp.src_path, fp.dst_path))
         yield c_
 ```
 
@@ -195,12 +196,15 @@ And when executed:
 .  mygroup:doit_api/tests/conftest => [doit_api/tests/conftest] doit_api/tests/conftest.py -> conftest.txt
 Running <Task: mygroup:doit_api/tests/conftest> because one of its targets does not exist: 'conftest.txt'
 >>> (todo) here you use WindowsPath('doit_api/tests/core/test_task_and_taskgen.py') to generate WindowsPath('test_task_and_taskgen.txt')
+
 .  mygroup:doit_api/tests/core/test_config => [doit_api/tests/core/test_config] doit_api/tests/core/test_config.py -> test_config.txt
 Running <Task: mygroup:doit_api/tests/core/test_config> because one of its targets does not exist: 'test_config.txt'
 >>> (todo) here you use WindowsPath('doit_api/tests/core/test_task_and_taskgen.py') to generate WindowsPath('test_task_and_taskgen.txt')
+
 .  mygroup:doit_api/tests/core/test_pickling => [doit_api/tests/core/test_pickling] doit_api/tests/core/test_pickling.py -> test_pickling.txt
 Running <Task: mygroup:doit_api/tests/core/test_pickling> because one of its targets does not exist: 'test_pickling.txt'
 >>> (todo) here you use WindowsPath('doit_api/tests/core/test_task_and_taskgen.py') to generate WindowsPath('test_task_and_taskgen.txt')
+
 .  mygroup:doit_api/tests/core/test_task_and_taskgen => [doit_api/tests/core/test_task_and_taskgen] doit_api/tests/core/test_task_and_taskgen.py -> test_task_and_taskgen.txt
 Running <Task: mygroup:doit_api/tests/core/test_task_and_taskgen> because one of its targets does not exist: 'test_task_and_taskgen.txt'
 >>> (todo) here you use WindowsPath('doit_api/tests/core/test_task_and_taskgen.py') to generate WindowsPath('test_task_and_taskgen.txt')
@@ -245,8 +249,11 @@ def b():
     - [doit-py](https://pythonhosted.org/doit-py/)
     - [doit-cmd](https://pythonhosted.org/doit-cmd/)
 
- - [celery](https://docs.celeryproject.org), another generic asynchronous task engine
- - [nox](https://nox.thea.codes), another task engine oriented towards build/test
+ - other task engines:
+ 
+   - [celery](https://docs.celeryproject.org), another task engine, generic and asynchronous
+   - [nox](https://nox.thea.codes), another task engine oriented towards build/test
+   - [invoke](http://www.pyinvoke.org/)
 
 ### Others
 
