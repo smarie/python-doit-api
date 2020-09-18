@@ -615,14 +615,15 @@ hello sub
 <span class="nd">@taskgen</span>
 <span class="k">def</span> <span class="nf">mygroup</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; hey !!! &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">fp</span> <span class="ow">in</span> <span class="n">file_pattern</span><span class="p">(</span><span class="n">src_pattern</span><span class="o">=</span><span class="s2">&quot;**/tests/**/[!_]*.py&quot;</span><span class="p">,</span> <span class="n">dst_pattern</span><span class="o">=</span><span class="s2">&quot;%.txt&quot;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">fp</span> <span class="ow">in</span> <span class="n">file_pattern</span><span class="p">(</span><span class="s2">&quot;**/tests/**/[!_]*.py&quot;</span><span class="p">,</span> <span class="s2">&quot;%.txt&quot;</span><span class="p">):</span>
         <span class="nd">@pytask</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">fp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                 <span class="n">doc</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">fp</span><span class="p">),</span>
                 <span class="n">file_dep</span><span class="o">=</span><span class="p">[</span><span class="n">fp</span><span class="o">.</span><span class="n">src_path</span><span class="p">],</span>
                 <span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="n">fp</span><span class="o">.</span><span class="n">dst_path</span><span class="p">],</span>
                 <span class="n">title</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">fp</span><span class="p">))</span>
         <span class="k">def</span> <span class="nf">c_</span><span class="p">():</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&gt;&gt;&gt; (todo) here you use </span><span class="si">%r</span><span class="s2"> to generate </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">src_path</span><span class="p">,</span> <span class="n">fp</span><span class="o">.</span><span class="n">dst_path</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&gt;&gt;&gt; (todo) here you use </span><span class="si">%r</span><span class="s2"> to generate </span><span class="si">%r</span><span class="se">\n</span><span class="s2">&quot;</span> 
+                  <span class="o">%</span> <span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">src_path</span><span class="p">,</span> <span class="n">fp</span><span class="o">.</span><span class="n">dst_path</span><span class="p">))</span>
         <span class="k">yield</span> <span class="n">c_</span>
 </code></pre></div>
 
@@ -639,12 +640,15 @@ mygroup:doit_api/tests/test_task_and_taskgen   <span class="o">[</span>doit_api/
 <div class="codehilite"><pre><span></span><code>.  mygroup:doit_api/tests/conftest <span class="o">=</span>&gt; <span class="o">[</span>doit_api/tests/conftest<span class="o">]</span> doit_api/tests/conftest.py -&gt; conftest.txt
 Running &lt;Task: mygroup:doit_api/tests/conftest&gt; because one of its targets does not exist: <span class="s1">&#39;conftest.txt&#39;</span>
 &gt;&gt;&gt; <span class="o">(</span>todo<span class="o">)</span> here you use WindowsPath<span class="o">(</span><span class="s1">&#39;doit_api/tests/core/test_task_and_taskgen.py&#39;</span><span class="o">)</span> to generate WindowsPath<span class="o">(</span><span class="s1">&#39;test_task_and_taskgen.txt&#39;</span><span class="o">)</span>
+
 .  mygroup:doit_api/tests/core/test_config <span class="o">=</span>&gt; <span class="o">[</span>doit_api/tests/core/test_config<span class="o">]</span> doit_api/tests/core/test_config.py -&gt; test_config.txt
 Running &lt;Task: mygroup:doit_api/tests/core/test_config&gt; because one of its targets does not exist: <span class="s1">&#39;test_config.txt&#39;</span>
 &gt;&gt;&gt; <span class="o">(</span>todo<span class="o">)</span> here you use WindowsPath<span class="o">(</span><span class="s1">&#39;doit_api/tests/core/test_task_and_taskgen.py&#39;</span><span class="o">)</span> to generate WindowsPath<span class="o">(</span><span class="s1">&#39;test_task_and_taskgen.txt&#39;</span><span class="o">)</span>
+
 .  mygroup:doit_api/tests/core/test_pickling <span class="o">=</span>&gt; <span class="o">[</span>doit_api/tests/core/test_pickling<span class="o">]</span> doit_api/tests/core/test_pickling.py -&gt; test_pickling.txt
 Running &lt;Task: mygroup:doit_api/tests/core/test_pickling&gt; because one of its targets does not exist: <span class="s1">&#39;test_pickling.txt&#39;</span>
 &gt;&gt;&gt; <span class="o">(</span>todo<span class="o">)</span> here you use WindowsPath<span class="o">(</span><span class="s1">&#39;doit_api/tests/core/test_task_and_taskgen.py&#39;</span><span class="o">)</span> to generate WindowsPath<span class="o">(</span><span class="s1">&#39;test_task_and_taskgen.txt&#39;</span><span class="o">)</span>
+
 .  mygroup:doit_api/tests/core/test_task_and_taskgen <span class="o">=</span>&gt; <span class="o">[</span>doit_api/tests/core/test_task_and_taskgen<span class="o">]</span> doit_api/tests/core/test_task_and_taskgen.py -&gt; test_task_and_taskgen.txt
 Running &lt;Task: mygroup:doit_api/tests/core/test_task_and_taskgen&gt; because one of its targets does not exist: <span class="s1">&#39;test_task_and_taskgen.txt&#39;</span>
 &gt;&gt;&gt; <span class="o">(</span>todo<span class="o">)</span> here you use WindowsPath<span class="o">(</span><span class="s1">&#39;doit_api/tests/core/test_task_and_taskgen.py&#39;</span><span class="o">)</span> to generate WindowsPath<span class="o">(</span><span class="s1">&#39;test_task_and_taskgen.txt&#39;</span><span class="o">)</span>
@@ -691,9 +695,13 @@ Running &lt;Task: mygroup:doit_api/tests/core/test_task_and_taskgen&gt; because 
 </ul>
 </li>
 <li>
-<p><a href="https://docs.celeryproject.org">celery</a>, another generic asynchronous task engine</p>
+<p>other task engines:</p>
+</li>
+<li>
+<p><a href="https://docs.celeryproject.org">celery</a>, another task engine, generic and asynchronous</p>
 </li>
 <li><a href="https://nox.thea.codes">nox</a>, another task engine oriented towards build/test</li>
+<li><a href="http://www.pyinvoke.org/">invoke</a></li>
 </ul>
 <h3 id="others">Others<a class="headerlink" href="#others" title="Permanent link">&para;</a></h3>
 <p><em>Do you like this library ? You might also like <a href="https://github.com/smarie/OVERVIEW#python">my other python libraries</a></em> </p>
@@ -752,7 +760,7 @@ Running &lt;Task: mygroup:doit_api/tests/core/test_task_and_taskgen&gt; because 
     </div>
     
       <script src="assets/javascripts/vendor.3636a4ec.min.js"></script>
-      <script src="assets/javascripts/bundle.e9fe3281.min.js"></script><script id="__lang" type="application/json">{"search.config.pipeline": "trimmer, stopWordFilter", "search.result.one": "1 matching document", "search.config.lang": "en", "search.result.none": "No matching documents", "clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.result.other": "# matching documents", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching"}</script>
+      <script src="assets/javascripts/bundle.e9fe3281.min.js"></script><script id="__lang" type="application/json">{"search.config.lang": "en", "search.config.separator": "[\\s\\-]+", "search.result.none": "No matching documents", "clipboard.copied": "Copied to clipboard", "search.result.one": "1 matching document", "clipboard.copy": "Copy to clipboard", "search.result.placeholder": "Type to start searching", "search.result.other": "# matching documents", "search.config.pipeline": "trimmer, stopWordFilter"}</script>
       
       <script>
         app = initialize({
