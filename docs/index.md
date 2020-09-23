@@ -25,7 +25,7 @@ Inspired by [`letsdoit`](https://pypi.org/project/letsdoit), `doit-api` proposes
 To create a single task you can use the `task` function or the `@pytask` decorator in your `dodo.py` file:
 
 ```python
-from doit_api import task, pytask
+from doit_api import task, pytask, cmdtask
 
 @pytask
 def a():
@@ -37,14 +37,22 @@ def b():
     print("hi")
 
 c = task(name="echoer", actions=["echo hi"], doc="the doc for e")
+
+@cmdtask
+def d():
+    return [
+        "echo hey",
+        "echo ho"
+    ]
 ```
 
-Then you can list the tasks as usual :
+Then you can list the tasks as usual (`doit` uses alphabetical order by default):
 
 ```bash
 >>> doit list
 a        the doc for a
 b
+d
 echoer   the doc for e
 ```
 
@@ -55,6 +63,8 @@ Execute them:
 .  a => Python: function a
 .  b => Python: function b
 .  echoer => Cmd: echo hi
+.  d => Cmd: echo hey
+        Cmd: echo hi
 ```
 
 And use verbosity to display the print messages too:
@@ -67,6 +77,10 @@ hi
 Running <Task: b> because one of its targets does not exist: 'out.txt'
 hi
 .  echoer => Cmd: echo hi
+hi
+.  d => Cmd: echo hey
+        Cmd: echo hi
+hey
 hi
 ```
 

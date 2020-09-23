@@ -672,10 +672,19 @@ def cmdtask(
 
     @cmdtask(targets='foo.txt', file_deps=..., ...)
     def b():
+        ''' the doc for b '''
         return '''
         echo about to create file
         echo hi > foo.txt
         '''
+
+    @cmdtask
+    def c():
+        ''' the doc for c '''
+        return [
+            "echo hi",
+            ("echo", "hi")
+        ]
     ```
 
     A minimal `doit` task consists of one or several actions. Here, the main action is a shell command or sequence
@@ -688,7 +697,7 @@ def cmdtask(
      - a tuple (not list!) of strings or pathlib Paths (command to be executed without the shell).
      - a list of strings or tuples. Note that in this case strings can not be multiline.
 
-    See https://pydoit.org/tasks.html#cmd-action
+    See [doit cmd-action](https://pydoit.org/tasks.html#cmd-action).
 
     You can specify actions to be done before and after that/these `actions` in `pre_actions` and `post_actions`.
     If `tell_why_i_am_running=True` (default) an additional action will be prepended to print the reason why the
