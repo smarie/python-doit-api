@@ -11,7 +11,7 @@ from doit.cmd_list import List
 from doit.cmd_run import Run
 from doit_api.tests.conftest import CmdFactory
 
-from doit_api import task, taskgen, pytask, why_am_i_running
+from doit_api import task, taskgen, pytask, why_am_i_running, cmdtask
 
 
 def test_task(monkeypatch, depfile_name, capsys):
@@ -26,6 +26,15 @@ def test_task(monkeypatch, depfile_name, capsys):
     def b():
         """ hey! """
         print("hello !!")
+
+    @cmdtask
+    def d():
+        """ hey!d """
+        return """
+        echo ola
+        # skipped comment
+        echo hey
+        """
 
     @taskgen
     def c():
@@ -65,7 +74,7 @@ def test_task(monkeypatch, depfile_name, capsys):
         loader.setup({})
         config = loader.load_doit_config()
         task_list = loader.load_tasks(Command(), [])
-        assert len(task_list) == 9
+        assert len(task_list) == 10
 
         # Note: unfortunately on python 3.5 and 3.6 the order does not seem guaranteed with this api
         # task a
@@ -86,6 +95,13 @@ def test_task(monkeypatch, depfile_name, capsys):
 
         # task c with 2 subtasks
         # todo
+
+        # task d
+        task_d = [t for t in task_list if t.name == 'd']
+        assert len(task_d) == 1
+        task_d = task_d[0]
+        assert task_d.actions[1]._action == "echo ola"
+        assert task_d.actions[2]._action == "echo hey"
 
     # ---- checks : list
     monkeypatch.setattr(sys, 'argv', ['did', 'list', '--all', '--db-file', depfile_name])
@@ -108,6 +124,7 @@ c:subtask 0           a subtask 0
 c:subtask 0 variant   a subtask 0 variant
 c:subtask 1           a subtask 1
 c:subtask 1 variant   a subtask 1 variant
+d                     hey!d
 """
 
     # -- checks : execution
@@ -124,6 +141,8 @@ c:subtask 1 variant   a subtask 1 variant
     with capsys.disabled():
         assert captured.out.replace("\r", "") == """hello !
 hello !!
+ola
+hey
 Running <Task: c:echo> because one of its targets does not exist: 'hoho.txt'
 hi
 hello
@@ -150,6 +169,7 @@ c:subtask 0           a subtask 0
 c:subtask 0 variant   a subtask 0 variant
 c:subtask 1           a subtask 1
 c:subtask 1 variant   a subtask 1 variant
+d                     hey!d
 """
 
         # formal checks: equivalent of   doit  (execution)
@@ -159,6 +179,8 @@ c:subtask 1 variant   a subtask 1 variant
         assert 0 == result
         assert output.getvalue() == """.  a => custom title
 .  b => Python: function test_task.<locals>.b
+.  d => Cmd: echo ola
+\tCmd: echo hey
 .  c:echo => Cmd: echo hi
 .  c:c_ => Python: function test_task.<locals>.c.<locals>.c_
 .  c:subtask 0 => this is 0 running
@@ -170,6 +192,8 @@ c:subtask 1 variant   a subtask 1 variant
         with capsys.disabled():
             assert captured.out.replace("\r", "") == """hello !
 hello !!
+ola
+hey
 Running <Task: c:echo> because one of its targets does not exist: 'hoho.txt'
 hi
 hello

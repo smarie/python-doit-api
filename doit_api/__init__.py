@@ -1,4 +1,4 @@
-from .main import why_am_i_running, title_with_actions, task, taskgen, pytask, doit_config
+from .main import why_am_i_running, title_with_actions, task, taskgen, pytask, cmdtask, doit_config
 
 try:
     # -- Distribution mode --
@@ -17,5 +17,5 @@ __all__ = [
     # submodules
     'main',
     # symbols
-    'task', 'taskgen', 'pytask', 'why_am_i_running', 'doit_config'
+    'task', 'taskgen', 'pytask', 'cmdtask', 'why_am_i_running', 'doit_config'
 ]

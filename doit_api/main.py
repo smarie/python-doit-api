@@ -635,6 +635,185 @@ class taskgen(taskbase):
 #         return kw
 
 
+def cmdtask(
+           # -- task information
+           name=None,                   # type: Union[str, Any]
+           doc=None,                    # type: str
+           # -- what the task is doing when run
+           title=title_with_actions,    # type: Union[str, Callable]
+           pre_actions=None,            # type: List[DoitAction]
+           post_actions=None,           # type: List[DoitAction]
+           tell_why_am_i_running=True,  # type: bool
+           # -- preventing useless runs and selecting order
+           targets=None,                # type: List[DoitPath]
+           clean=None,                  # type: Union[bool, List[DoitAction]]
+           file_dep=None,               # type: List[DoitPath]
+           task_dep=None,               # type: List[DoitTask]
+           uptodate=None,               # type: List[Optional[Union[bool, Callable, str]]]
+           # -- advanced
+           setup=None,                  # type: List[DoitTask]
+           teardown=None,               # type: List[DoitAction]
+           getargs=None,                # type: Dict[str, Tuple[str, str]]
+           calc_dep=None,               # type: List[DoitTask]
+           # -- misc
+           verbosity=None               # type: int
+):
+    """
+    A decorator to create a task containing a shell command action (returned by the decorated function), and
+    optional additional actions.
+
+    ```python
+    from doit_api import cmdtask
+
+    @cmdtask
+    def a():
+        ''' the doc for a '''
+        return "echo hi"
+
+    @cmdtask(targets='foo.txt', file_deps=..., ...)
+    def b():
+        return '''
+        echo about to create file
+        echo hi > foo.txt
+        '''
+    ```
+
+    A minimal `doit` task consists of one or several actions. Here, the main action is a shell command or sequence
+    of shell commands, returned by the decorated function. In addition to supporting all ways to express a command
+    action in doit, this also supports multiline strings and plain string or tuple (not in a list). Your function
+    can return:
+
+     - A string (command to be executed with the shell).
+     - A multiline string (commands to be executed with the shell, line by line. Blank lines automatically trimmed)
+     - a tuple (not list!) of strings or pathlib Paths (command to be executed without the shell).
+     - a list of strings or tuples. Note that in this case strings can not be multiline.
+
+    See https://pydoit.org/tasks.html#cmd-action
+
+    You can specify actions to be done before and after that/these `actions` in `pre_actions` and `post_actions`.
+    If `tell_why_i_am_running=True` (default) an additional action will be prepended to print the reason why the
+    task is running if the task declared a `file_dep`, `task_dep`, `uptodate` or `targets`.
+
+    All other parameters match those in `doit` conventions (See docstrings below), except
+
+     - `name` that is an intelligent placeholder for `basename` (if a task is a simple task) or `name` (if the task
+       is a subtask in a `@taskgen` generator),
+     - `title` that adds support for plain strings and by default is `title_with_actions`
+     - `task_dep`, `setup` and `calc_dep` where if a task callable (decorated with `@task` or not) is provided, the
+       corresponding name will be used.
+
+    Note: the `watch` parameter (Linux and Mac only) is not yet supported.
+    See https://pydoit.org/cmd_other.html?highlight=watch#auto-watch
+
+    :param name: an alternate name for the task. By default the name of the decorated function is used. Note that
+        this parameter will intelligently set 'basename' for normal tasks or 'name' for subtasks in a task
+        generator (`@taskgen`). See https://pydoit.org/tasks.html#task-name
+    :param doc: an optional documentation string for the task. By default, the decorated function docstring will
+        be used. See https://pydoit.org/tasks.html#doc
+    :param title: an optional message string or callable generating a message, to print when the task is run. If
+        nothing is provided, by default the task name is printed. If a string is provided, the task name will
+        automatically be printed before it. If a callable is provided it should receive a single `task` argument
+        and return a string. See https://pydoit.org/tasks.html#title
+    :param pre_actions: an optional list of actions to be executed before the main python action.
+        There are 2 basic kinds of actions: cmd-action and python-action. See https://pydoit.org/tasks.html#actions
+    :param post_actions: an optional list of actions to be executed after the main python action.
+        There are 2 basic kinds of actions: cmd-action and python-action. See https://pydoit.org/tasks.html#actions
+    :param tell_why_am_i_running: if True (default), an additional `why_am_i_running` action is prepended to the
+        list of actions
+    :param file_dep: an optional list of strings or instances of any pathlib Path class indicating the files
+        required for this task to run. When none of these files are modified, the task will be skipped if already
+        run. See https://pydoit.org/tasks.html#file-dep-file-dependency
+    :param task_dep: an optional list of tasks (names or callables) that should be run *before* this task. Note
+        that this is also a convenient way to create a group of tasks.
+        See https://pydoit.org/dependencies.html#task-dependency
+    :param uptodate: an optional list where each element can be True (up to date), False (not up to date),
+        None (ignored), a callable or a command(string). Many pre-baked callables from `doit.tools` can be used:
+        `result_dep` to depend on the result of another task, `run_once` to run only once, `timeout` for time-based
+        expiration, `config_changed`for changes in a "configuration" string or dictionary, and more...
+        See https://pydoit.org/dependencies.html#uptodate
+    :param targets: an optional list of strings or instances of any pathlib Path class indicating the files created
+        by the task. They can be any file path (a file or folder). If a target does not exist the task will be
+        executed. Two different tasks *can not* have the same target. See https://pydoit.org/tasks.html#targets
+    :param clean: an optional boolean or list of tasks indicating if the task should perform some cleaning when
+        `doit clean` is executed. `True` means "delete all targets". If there is a folder as a target it will be
+        removed if the folder is empty, otherwise it will display a warning message. If you want to clean the
+        targets and add some custom clean actions, you can include the doit.task.clean_targets
+        See https://pydoit.org/cmd_other.html#clean
+    :param setup: tasks to be run before this task but only when it is run.
+        See https://pydoit.org/dependencies.html#setup-task
+    :param teardown: actions to run once all tasks are completed.
+        See https://pydoit.org/dependencies.html#setup-task
+    :param getargs: an optional dictionary where the key is the argument name used on actions, and the value is a
+        tuple with 2 strings: task name, "value name". getargs provides a way to use values computed from one task
+        in another task. See https://pydoit.org/dependencies.html#getargs
+    :param calc_dep: See https://pydoit.org/dependencies.html#calculated-dependencies
+    :param verbosity: an optional custom verbosity level (0, 1, or 2) for this task:
+        0 capture (do not print) stdout/stderr from task,
+        1 capture stdout only,
+        2 do not capture anything (print everything immediately).
+        Default is 1. See https://pydoit.org/tasks.html#verbosity
+    """
+
+    # our decorator
+    def _decorate(f  # type: Callable
+                  ):
+
+        # checks on the decorated function name
+        if f.__name__.startswith("task_"):
+            raise ValueError("You can not decorate a function named `task_xxx` with `@pytask` ; please remove the "
+                             "`task_` prefix.")
+
+        # call the function to get the list of actions
+        f_actions = f()
+        if isinstance(f_actions, str):
+            f_actions = get_multiline_actions(f_actions)
+        elif isinstance(f_actions, tuple):
+            f_actions = [f_actions]
+        elif isinstance(f_actions, list):
+            # just convert the possible tuples inside, into lists.
+            f_actions = [list(a) if isinstance(a, tuple) else a for a in f_actions]
+        else:
+            raise TypeError("Unsupported return type for @cmdtask '%s': returned %r" % (f.__name__, f_actions))
+
+        # create the actions: pre + [fun] + post
+        actions = []
+        for _actions in (pre_actions, f_actions, post_actions):
+            if _actions is None:
+                continue
+            if not isinstance(_actions, list):
+                raise TypeError("pre_actions and post_actions should be lists")
+            # for a in _actions:
+            #     validate_action(a)
+            actions += _actions
+
+        # create the task object
+        f_task = task(name=name, doc=doc,
+                      title=title, actions=actions,
+                      tell_why_am_i_running=tell_why_am_i_running,
+                      targets=targets, clean=clean, file_dep=file_dep, task_dep=task_dep, uptodate=uptodate,
+                      setup=setup, teardown=teardown, getargs=getargs, calc_dep=calc_dep,
+                      verbosity=verbosity)
+
+        # declare the fun
+        f_task.add_default_desc_from_fun(f)
+
+        # move the hooks from f_task to f
+        f.create_doit_tasks = f_task.create_doit_tasks
+        del f_task.create_doit_tasks
+        f._create_doit_tasks = f_task._create_doit_tasks
+
+        return f
+
+    if name is not None and callable(name):
+        # used without arguments: we have to return a function, not a task ! otherwise pickle wont work
+        f = name
+        name = None  # important ! indeed it is used in _decorate
+        return _decorate(f)
+    else:
+        # used with arguments: return a decorator
+        return _decorate
+
+
 def pytask(
            # -- task information
            name=None,                   # type: Union[str, Any]
@@ -800,3 +979,29 @@ if sys.version_info < (3, 0):
             return getattr, (m.im_self, m.im_func.func_name)
 
     copy_reg.pickle(types.MethodType, _pickle_method)
+
+
+def get_multiline_actions(a_string):
+    """
+    Transforms the multiline command string provided into a list of single-line commands
+    separator.
+
+    :param a_string:
+    :return: a list of action strings
+    """
+    def _procline(l):
+        # remove spaces on the left
+        l = l.strip()
+
+        # remove comments
+        try:
+            cmt_idx = l.index('#')
+            l = l[:cmt_idx]
+        except:
+            pass
+
+        # finally remove trailing spaces
+        return l.rstrip()
+
+    lines = [_procline(l) for l in a_string.splitlines()]
+    return [l for l in lines if len(l) > 0]
