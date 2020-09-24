@@ -27,7 +27,7 @@ def test_task(monkeypatch, depfile_name, capsys):
         """ hey! """
         print("hello !!")
 
-    @cmdtask
+    @cmdtask(task_dep=[b])
     def d():
         """ hey!d """
         return """
