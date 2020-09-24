@@ -689,8 +689,9 @@ def cmdtask(
 
     A minimal `doit` task consists of one or several actions. Here, the main action is a shell command or sequence
     of shell commands, returned by the decorated function. In addition to supporting all ways to express a command
-    action in doit, this also supports multiline strings and plain string or tuple (not in a list). Your function
-    can return:
+    action in doit, this also supports multiline strings (see rejected
+    [feature request](https://github.com/pydoit/doit/issues/314)) and plain string or tuple (not in a list). Your
+    function can return:
 
      - A string (command to be executed with the shell).
      - A multiline string (commands to be executed with the shell, line by line. Blank lines automatically trimmed)
