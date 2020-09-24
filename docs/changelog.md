@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.7.0 - New `@cmdtask`
+
+ * New `@cmdtask` similar to `@pytask` but to create shell commands. Fixes [#5](https://github.com/smarie/python-doit-api/issues/5)
+
 ### 0.6.1 - New `doit_config` + API change to support multiprocessing
 
  * New `doit_config()` utility method to generate a valid `DOIT_CONFIG` in its caller module. Fixes [#1](https://github.com/smarie/python-doit-api/issues/1)
