@@ -12,7 +12,7 @@
       
       
       <link rel="shortcut icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.5.13">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.5.14">
     
     
       
@@ -20,7 +20,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.077507d7.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.d3202873.min.css">
       
       
     
@@ -486,7 +486,7 @@
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
 <h3 id="single-task">Single task<a class="headerlink" href="#single-task" title="Permanent link">&para;</a></h3>
 <p>To create a single task you can use the <code>task</code> function or the <code>@pytask</code> decorator in your <code>dodo.py</code> file:</p>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">doit_api</span> <span class="kn">import</span> <span class="n">task</span><span class="p">,</span> <span class="n">pytask</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">doit_api</span> <span class="kn">import</span> <span class="n">task</span><span class="p">,</span> <span class="n">pytask</span><span class="p">,</span> <span class="n">cmdtask</span>
 
 <span class="nd">@pytask</span>
 <span class="k">def</span> <span class="nf">a</span><span class="p">():</span>
@@ -498,13 +498,21 @@
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
 
 <span class="n">c</span> <span class="o">=</span> <span class="n">task</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;echoer&quot;</span><span class="p">,</span> <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;echo hi&quot;</span><span class="p">],</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;the doc for e&quot;</span><span class="p">)</span>
+
+<span class="nd">@cmdtask</span>
+<span class="k">def</span> <span class="nf">d</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="s2">&quot;echo hey&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;echo ho&quot;</span>
+    <span class="p">]</span>
 </code></pre></div>
 
 
-<p>Then you can list the tasks as usual :</p>
+<p>Then you can list the tasks as usual (<code>doit</code> uses alphabetical order by default):</p>
 <div class="codehilite"><pre><span></span><code>&gt;&gt;&gt; doit list
 a        the doc <span class="k">for</span> a
 b
+d
 echoer   the doc <span class="k">for</span> e
 </code></pre></div>
 
@@ -514,6 +522,8 @@ echoer   the doc <span class="k">for</span> e
 .  <span class="nv">a</span> <span class="o">=</span>&gt; Python: <span class="k">function</span> a
 .  <span class="nv">b</span> <span class="o">=</span>&gt; Python: <span class="k">function</span> b
 .  <span class="nv">echoer</span> <span class="o">=</span>&gt; Cmd: <span class="nb">echo</span> hi
+.  <span class="nv">d</span> <span class="o">=</span>&gt; Cmd: <span class="nb">echo</span> hey
+        Cmd: <span class="nb">echo</span> hi
 </code></pre></div>
 
 
@@ -525,6 +535,10 @@ hi
 Running &lt;Task: b&gt; because one of its targets does not exist: <span class="s1">&#39;out.txt&#39;</span>
 hi
 .  <span class="nv">echoer</span> <span class="o">=</span>&gt; Cmd: <span class="nb">echo</span> hi
+hi
+.  <span class="nv">d</span> <span class="o">=</span>&gt; Cmd: <span class="nb">echo</span> hey
+        Cmd: <span class="nb">echo</span> hi
+hey
 hi
 </code></pre></div>
 
@@ -761,7 +775,7 @@ Running &lt;Task: mygroup:doit_api/tests/core/test_task_and_taskgen&gt; because 
     </div>
     
       <script src="assets/javascripts/vendor.2d1db4bd.min.js"></script>
-      <script src="assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"search.config.lang": "en", "search.result.placeholder": "Type to start searching", "search.config.separator": "[\\s\\-]+", "search.result.other": "# matching documents", "search.config.pipeline": "trimmer, stopWordFilter", "clipboard.copied": "Copied to clipboard", "search.result.one": "1 matching document", "search.result.none": "No matching documents", "clipboard.copy": "Copy to clipboard"}</script>
+      <script src="assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"search.config.lang": "en", "search.config.separator": "[\\s\\-]+", "search.config.pipeline": "trimmer, stopWordFilter", "search.result.placeholder": "Type to start searching", "search.result.other": "# matching documents", "clipboard.copied": "Copied to clipboard", "search.result.none": "No matching documents", "clipboard.copy": "Copy to clipboard", "search.result.one": "1 matching document"}</script>
       
       <script>
         app = initialize({
