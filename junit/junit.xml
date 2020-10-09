@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?><testsuite errors="0" failures="0" name="pytest" skips="0" tests="5" time="0.188"><testcase classname="doit_api.tests.core.test_config" file="doit_api/tests/core/test_config.py" line="13" name="test_config_simple" time="0.006245136260986328"></testcase><testcase classname="doit_api.tests.core.test_config" file="doit_api/tests/core/test_config.py" line="32" name="test_valid_config" time="0.01808619499206543"><system-out>hi
+<?xml version="1.0" encoding="utf-8"?><testsuite errors="0" failures="0" name="pytest" skips="0" tests="5" time="0.184"><testcase classname="doit_api.tests.core.test_config" file="doit_api/tests/core/test_config.py" line="13" name="test_config_simple" time="0.006142139434814453"></testcase><testcase classname="doit_api.tests.core.test_config" file="doit_api/tests/core/test_config.py" line="32" name="test_valid_config" time="0.018062829971313477"><system-out>hi
 </system-out><system-err>/bin/sh: 1: ech: not found
-</system-err></testcase><testcase classname="doit_api.tests.core.test_pickling" file="doit_api/tests/core/test_pickling.py" line="5" name="test_pickle_simple" time="0.002309083938598633"></testcase><testcase classname="doit_api.tests.core.test_pickling" file="doit_api/tests/core/test_pickling.py" line="19" name="test_pickle_simple_decorator" time="0.0010242462158203125"></testcase><testcase classname="doit_api.tests.core.test_task_and_taskgen" file="doit_api/tests/core/test_task_and_taskgen.py" line="16" name="test_task" time="0.04694962501525879"><system-out>.  a =&gt; custom title
+</system-err></testcase><testcase classname="doit_api.tests.core.test_pickling" file="doit_api/tests/core/test_pickling.py" line="5" name="test_pickle_simple" time="0.0022385120391845703"></testcase><testcase classname="doit_api.tests.core.test_pickling" file="doit_api/tests/core/test_pickling.py" line="19" name="test_pickle_simple_decorator" time="0.0010020732879638672"></testcase><testcase classname="doit_api.tests.core.test_task_and_taskgen" file="doit_api/tests/core/test_task_and_taskgen.py" line="17" name="test_task" time="0.04091215133666992"><system-out>.  a =&gt; custom title
 .  b =&gt; Python: function test_task.&lt;locals&gt;.b
-.  d =&gt; Cmd: echo ola
-	Cmd: echo hey
+.  d =&gt; Cmd: echo ola; echo hey
 .  c:echo =&gt; Cmd: echo hi
 .  c:c_ =&gt; Python: function test_task.&lt;locals&gt;.c.&lt;locals&gt;.c_
 .  c:subtask 0 =&gt; this is 0 running
