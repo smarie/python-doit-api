@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.8.0 - Multiline command actions
+
+ * Multiline string command actions are now interpreted as to be concatenated into the same shell command using `&` (windows) or `;` (linux). This allows several commands to leverage each other, for example `conda activate` + some python execution. Fixes [#6](https://github.com/smarie/python-doit-api/issues/6)
+
 ### 0.7.0 - New `@cmdtask`
 
  * New `@cmdtask` similar to `@pytask` but to create shell commands. Fixes [#5](https://github.com/smarie/python-doit-api/issues/5)
