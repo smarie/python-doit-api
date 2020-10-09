@@ -2,6 +2,7 @@ import sys
 
 from inspect import isgeneratorfunction
 from os.path import exists
+import platform
 
 try:
     from typing import Callable, Union, List, Tuple, Dict, Optional, Type, Any
@@ -689,12 +690,15 @@ def cmdtask(
 
     A minimal `doit` task consists of one or several actions. Here, the main action is a shell command or sequence
     of shell commands, returned by the decorated function. In addition to supporting all ways to express a command
-    action in doit, this also supports multiline strings (see rejected
-    [feature request](https://github.com/pydoit/doit/issues/314)) and plain string or tuple (not in a list). Your
-    function can return:
+    action in doit, this also supports multiline strings to easily concatenate several commands into one (see rejected
+    [feature request](https://github.com/pydoit/doit/issues/314)), and plain string or tuple (not in a list). Your
+    function can therefore return:
 
      - A string (command to be executed with the shell).
-     - A multiline string (commands to be executed with the shell, line by line. Blank lines automatically trimmed)
+     - A multiline string (commands to be executed with the shell. Blank lines automatically trimmed.
+       All lines are concatenated into the same shell command using '&' (windows) or ';' (linux) before
+       execution). This allows several commands to leverage each other, for example `conda activate` + some
+       python execution.
      - a tuple (not list!) of strings or pathlib Paths (command to be executed without the shell).
      - a list of strings or tuples. Note that in this case strings can not be multiline.
 
@@ -776,7 +780,8 @@ def cmdtask(
         # call the function to get the list of actions
         f_actions = f()
         if isinstance(f_actions, str):
-            f_actions = get_multiline_actions(f_actions)
+            # by default multiline strings are executed in the same shell command
+            f_actions = [join_cmds(get_multiline_actions(f_actions))]
         elif isinstance(f_actions, tuple):
             f_actions = [f_actions]
         elif isinstance(f_actions, list):
@@ -993,8 +998,7 @@ if sys.version_info < (3, 0):
 
 def get_multiline_actions(a_string):
     """
-    Transforms the multiline command string provided into a list of single-line commands
-    separator.
+    Transforms the multiline command string provided into a list of single-line commands.
 
     :param a_string:
     :return: a list of action strings
@@ -1015,3 +1019,33 @@ def get_multiline_actions(a_string):
 
     lines = [_procline(l) for l in a_string.splitlines()]
     return [l for l in lines if len(l) > 0]
+
+
+OS_CMD_SEP = ' & ' if platform.system() == 'Windows' else ' ; '
+
+
+def join_cmds(cmds_list):
+    """
+    Joins all commands in cmds_list into a single-line command, with the appropriate OS-dependent separator.
+    See https://github.com/pydoit/doit/issues/314 (rejected :( )
+
+    :param cmds_list: a list of shell commands (string)
+    :return: a single string containing a shell command
+    """
+    def _procline(l):
+        # remove spaces on the left
+        l = l.strip()
+
+        # remove comments
+        try:
+            cmt_idx = l.index('#')
+            l = l[:cmt_idx]
+        except:
+            pass
+
+        # finally remove trailing spaces
+        return l.rstrip()
+
+    lines = [_procline(l) for l in cmds_list]
+    lines = [l for l in lines if len(l) > 0]
+    return OS_CMD_SEP.join(lines)
