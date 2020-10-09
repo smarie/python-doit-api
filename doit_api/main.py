@@ -1021,7 +1021,7 @@ def get_multiline_actions(a_string):
     return [l for l in lines if len(l) > 0]
 
 
-OS_CMD_SEP = ' & ' if platform.system() == 'Windows' else ' ; '
+OS_CMD_SEP = '& ' if platform.system() == 'Windows' else '; '
 
 
 def join_cmds(cmds_list):

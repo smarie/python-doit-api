@@ -102,7 +102,7 @@ def test_task(monkeypatch, depfile_name, capsys):
         assert len(task_d) == 1
         task_d = task_d[0]
         assert len(task_d.actions) == 2
-        _sep = ' & ' if platform.system() == 'Windows' else ' ; '
+        _sep = '& ' if platform.system() == 'Windows' else '; '
         assert task_d.actions[1]._action.split(_sep) == ["echo ola", "echo hey"]
 
     # ---- checks : list
@@ -143,7 +143,7 @@ d                     hey!d
     with capsys.disabled():
         assert captured.out.replace("\r", "") == """hello !
 hello !!
-ola 
+ola
 hey
 Running <Task: c:echo> because one of its targets does not exist: 'hoho.txt'
 hi
@@ -193,7 +193,7 @@ d                     hey!d
         with capsys.disabled():
             assert captured.out.replace("\r", "") == """hello !
 hello !!
-ola 
+ola
 hey
 Running <Task: c:echo> because one of its targets does not exist: 'hoho.txt'
 hi
