@@ -1,3 +1,4 @@
+import platform
 import sys
 
 try:
@@ -100,8 +101,9 @@ def test_task(monkeypatch, depfile_name, capsys):
         task_d = [t for t in task_list if t.name == 'd']
         assert len(task_d) == 1
         task_d = task_d[0]
-        assert task_d.actions[1]._action == "echo ola"
-        assert task_d.actions[2]._action == "echo hey"
+        assert len(task_d.actions) == 2
+        _sep = ' & ' if platform.system() == 'Windows' else ' ; '
+        assert task_d.actions[1]._action.split(_sep) == ["echo ola", "echo hey"]
 
     # ---- checks : list
     monkeypatch.setattr(sys, 'argv', ['did', 'list', '--all', '--db-file', depfile_name])
@@ -141,7 +143,7 @@ d                     hey!d
     with capsys.disabled():
         assert captured.out.replace("\r", "") == """hello !
 hello !!
-ola
+ola 
 hey
 Running <Task: c:echo> because one of its targets does not exist: 'hoho.txt'
 hi
@@ -179,20 +181,19 @@ d                     hey!d
         assert 0 == result
         assert output.getvalue() == """.  a => custom title
 .  b => Python: function test_task.<locals>.b
-.  d => Cmd: echo ola
-\tCmd: echo hey
+.  d => Cmd: echo ola%secho hey
 .  c:echo => Cmd: echo hi
 .  c:c_ => Python: function test_task.<locals>.c.<locals>.c_
 .  c:subtask 0 => this is 0 running
 .  c:subtask 0 variant => this is 0 running variant
 .  c:subtask 1 => this is 1 running
 .  c:subtask 1 variant => this is 1 running variant
-"""
+""" % _sep
         captured = capsys.readouterr()
         with capsys.disabled():
             assert captured.out.replace("\r", "") == """hello !
 hello !!
-ola
+ola 
 hey
 Running <Task: c:echo> because one of its targets does not exist: 'hoho.txt'
 hi
