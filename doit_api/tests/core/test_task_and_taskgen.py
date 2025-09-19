@@ -130,7 +130,9 @@ d                     hey!d
 """
 
     # -- checks : execution
-    monkeypatch.setattr(sys, 'argv', ['did', '--verbosity', '2', '--db-file', depfile_name])
+    # use a different database file to avoid locking issues on Linux
+    execution_db_file = depfile_name + "_exec"
+    monkeypatch.setattr(sys, 'argv', ['did', '--verbosity', '2', '--db-file', execution_db_file])
     try:
         # run
         run(locals())
@@ -175,8 +177,10 @@ d                     hey!d
 """
 
         # formal checks: equivalent of   doit  (execution)
+        # use a different database file to avoid locking issues on Linux
+        execution_db_file = depfile_name + "_exec"
         output = StringIO()
-        cmd_run = CmdFactory(Run, backend='dbm', dep_file=depfile_name, task_list=task_list)
+        cmd_run = CmdFactory(Run, backend='dbm', dep_file=execution_db_file, task_list=task_list)
         result = cmd_run._execute(output, verbosity=2)
         assert 0 == result
         assert output.getvalue() == """.  a => custom title
